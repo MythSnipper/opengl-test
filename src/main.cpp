@@ -11,6 +11,7 @@ void processInput(GLFWwindow* window){
   }
 }
 
+
 int main(int argc, char* argv[]){
   #ifdef _WIN32
   std::cout << "Running on windows\n";
