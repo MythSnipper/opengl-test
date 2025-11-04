@@ -3,9 +3,8 @@
 
 #include <iostream>
 
+#include "nucklib.hpp"
 
-#include <glad/glad.h>
-#include <glfw/glfw3.h>
 
 
 

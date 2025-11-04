@@ -8,6 +8,9 @@ CXXFLAGS = -std=c++23 \
 -O0 \
 -g
 CXXLIBS = -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl
+CXXFLAGS += -Wno-write-strings -Wno-old-style-cast -Wno-sign-conversion
+
+
 
 CXX_WIN = x86_64-w64-mingw32-g++
 CXXFLAGS_WIN = -std=c++23 \
@@ -17,56 +20,67 @@ CXXFLAGS_WIN = -std=c++23 \
 -O0 \
 -g
 CXXLIBS_WIN = -Llibs/glfw -lglfw3 -lopengl32 -lgdi32 -luser32 -lkernel32 -static
+CXXFLAGS_WIN += -Wno-write-strings -Wno-old-style-cast -Wno-sign-conversion 
 
 
-OBJ = obj/main.o \
-obj/glad_linux.o
 
-OBJ_WIN = obj/main.o \
-obj/glad_windows.o
+
+
+
+
+SRC := $(wildcard src/*.cpp)
+
+OBJ_COMP := $(patsubst src/%.cpp,obj/linux/%.o,$(SRC))
+OBJ_COMP_WIN := $(patsubst src/%.cpp,obj/windows/%.o,$(SRC))
+
+OBJ = $(wildcard obj/linux/*.o)
+OBJ_WIN = $(wildcard obj/windows/*.o)
 
 TARGET = build/main
 TARGET_WIN = build/main.exe
 
+linux: $(TARGET) clean_obj
 
-
-linux: $(TARGET) clean_objs
-
-$(TARGET): objs #linking
+$(TARGET): $(OBJ_COMP) #linking
 	$(CXX) $(OBJ) -o $(TARGET) $(CXXLIBS)
+	strip $(TARGET)
 
 #compiling
-objs: #paths are hard coded because I crash out
-	$(CXX) $(CXXFLAGS) -c src/main.cpp -o obj/main.o 
+obj/linux/%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-windows: $(TARGET_WIN) clean_objs
+clean_obj:
+	rm $(OBJ_COMP)
+	
 
-$(TARGET_WIN): windows_objs #linking
+
+
+
+win: $(TARGET_WIN) clean_obj_win
+
+$(TARGET_WIN): $(OBJ_COMP_WIN) #linking
 	$(CXX_WIN) $(OBJ_WIN) -o $(TARGET_WIN) $(CXXLIBS_WIN)
 
 #compiling
-windows_objs: #paths are hard coded because I crash out
-	$(CXX_WIN) $(CXXFLAGS_WIN) -c src/main.cpp -o obj/main.o
+obj/windows/%.o: src/%.cpp
+	$(CXX_WIN) $(CXXFLAGS_WIN) -c $< -o $@
 
-#clean up
-clean_objs:
-	rm obj/main.o
-
+clean_obj_win:
+	rm $(OBJ_COMP_WIN)
 
 
-test: clean linux run
 
-test_win: clean windows run_windows
+
+test: linux run
+
+test_win: win run_win
 
 run:
 	build/main
 
-run_windows:
+run_win:
 	wine build/main.exe
 
-
-
 clean:
-
 	rm -rf build/*
 

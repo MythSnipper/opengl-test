@@ -18,24 +18,7 @@ int main(int argc, char* argv[]){
         std::cout << "Running on linux\n";
     #endif
 
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,  3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,  3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    GLFWwindow* window = glfwCreateWindow(800, 600, "nuck OpenGL test", NULL, NULL);
-    if(!window){
-        std::cout << "Failed to create GLFW window\n";
-        glfwTerminate();
-        return 1;
-    }
-    glfwMakeContextCurrent(window);
-    if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
-        std::cout << "Failed to initialize GLAD\n";
-        return 1;
-    }
-    glViewport(0, 0, 800, 600);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    nuck::glfw glfw(3, 3, );
 
     
     char* vertexShaderSource = "#version 330 core\n"
