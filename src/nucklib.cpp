@@ -36,6 +36,9 @@ namespace nuck{
         glfwPollEvents();
         glfwSwapBuffers(window);
     }
+    void WindowManager::close_window(){
+        glfwSetWindowShouldClose(window, true);
+    }
 
 
 
@@ -46,6 +49,12 @@ namespace nuck{
         if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
             glfwSetWindowShouldClose(window, true);
         }
+    }
+    bool InputManager::key_down(uint32_t key_code){
+        if(glfwGetKey(window, key_code) == GLFW_PRESS){
+            return true;
+        }
+        return false;
     }
 
 
@@ -174,12 +183,13 @@ namespace nuck{
     void VBO::bind(){
         glBindBuffer(GL_ARRAY_BUFFER, id);
     }
+    void VBO::unbind(){
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
     void VBO::fill(float vertices[], size_t vertices_size, GLenum usage){
         bind();
         glBufferData(GL_ARRAY_BUFFER, vertices_size, vertices, usage);
     }
-
-
 
     VAO::VAO(){
         glGenVertexArrays(1, &id);
@@ -187,8 +197,9 @@ namespace nuck{
     void VAO::bind(){
         glBindVertexArray(id);
     }
-
-
+    void VAO::unbind(){
+        glBindVertexArray(0);
+    }
 
     EBO::EBO(){
         glGenBuffers(1, &id);
@@ -200,12 +211,20 @@ namespace nuck{
     void EBO::bind(){
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
     }
+    void EBO::unbind(){
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
     void EBO::fill(uint32_t indices[], size_t indices_size, GLenum usage){
         bind();
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size, indices, usage);
     }
 
 
+
+    void GL::wireframe_mode(bool enable){
+        glPolygonMode(GL_FRONT_AND_BACK, (enable) ? GL_LINE : GL_FILL);
+    }
+    
 
 
 

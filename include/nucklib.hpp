@@ -22,6 +22,7 @@ namespace nuck{
         static void window_framebuffer_size_callback(GLFWwindow* window, int window_width, int window_height);
         int window_should_exit();
         void refresh();
+        void close_window();
 
         private:
         bool killGLFW = false;
@@ -34,7 +35,8 @@ namespace nuck{
 
         InputManager(GLFWwindow* window);
         void process_input();
-    
+        bool key_down(uint32_t key_code);
+
         private:
 
 
@@ -78,6 +80,7 @@ namespace nuck{
         VBO();
         VBO(float vertices[], size_t vertices_size, GLenum usage);
         void bind();
+        void unbind();
         void fill(float vertices[], size_t vertices_size, GLenum usage);
         private:
 
@@ -89,6 +92,7 @@ namespace nuck{
 
         VAO();
         void bind();
+        void unbind();
         private:
 
 
@@ -100,10 +104,17 @@ namespace nuck{
         EBO();
         EBO(uint32_t indices[], size_t indices_size, GLenum usage);
         void bind();
+        void unbind();
         void fill(uint32_t indices[], size_t indices_size, GLenum usage);
         private:
 
-        
+
+    };
+    class GL{
+        public:
+        void wireframe_mode(bool enable);
+
+
     };
 
 
