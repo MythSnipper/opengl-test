@@ -30,17 +30,18 @@ namespace nuck{
     };
     class InputManager{
         public:
+        GLFWwindow* window;
 
         InputManager(GLFWwindow* window);
         void process_input();
     
         private:
-        GLFWwindow* window;
+
 
     };
     class VertexShader{
         public:
-        uint32_t shaderID;
+        uint32_t id;
 
         VertexShader(char** shader_source_addr);
         VertexShader(char* filename);
@@ -51,7 +52,7 @@ namespace nuck{
     };
     class FragmentShader{
         public:
-        uint32_t shaderID;
+        uint32_t id;
 
         FragmentShader(char** shader_source_addr);
         FragmentShader(char* filename);
@@ -62,7 +63,7 @@ namespace nuck{
     };
     class ShaderProgram{
         public:
-        uint32_t shaderProgramID;
+        uint32_t id;
 
         ShaderProgram(VertexShader* vertex_shader, FragmentShader* fragment_shader);
         void activate();
@@ -70,6 +71,44 @@ namespace nuck{
         
 
     };
+    class VBO{
+        public:
+        uint32_t id;
+
+        VBO();
+        VBO(float vertices[], size_t vertices_size, GLenum usage);
+        void bind();
+        void fill(float vertices[], size_t vertices_size, GLenum usage);
+        private:
+
+
+    };
+    class VAO{
+        public:
+        uint32_t id;
+
+        VAO();
+        void bind();
+        private:
+
+
+    };
+    class EBO{
+        public:
+        uint32_t id;
+
+        EBO();
+        EBO(uint32_t indices[], size_t indices_size, GLenum usage);
+        void bind();
+        void fill(uint32_t indices[], size_t indices_size, GLenum usage);
+        private:
+
+        
+    };
+
+
+
+
 
 
     

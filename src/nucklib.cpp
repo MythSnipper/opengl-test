@@ -51,15 +51,15 @@ namespace nuck{
 
 
     VertexShader::VertexShader(char** shader_source_addr){
-        shaderID = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(shaderID, 1, shader_source_addr, NULL);
-        glCompileShader(shaderID);
+        id = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(id, 1, shader_source_addr, NULL);
+        glCompileShader(id);
         {
             int success;
             char infoLog[512];
-            glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
+            glGetShaderiv(id, GL_COMPILE_STATUS, &success);
             if(!success){
-                glGetShaderInfoLog(shaderID, 512, NULL, infoLog);
+                glGetShaderInfoLog(id, 512, NULL, infoLog);
                 printf("VERTEX SHADER COMPILATION FAILED! \n%s\n", infoLog);
             }
             else{
@@ -69,15 +69,15 @@ namespace nuck{
     }
     VertexShader::VertexShader(char* filename){
         char* shader_source = read_file(filename);
-        shaderID = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(shaderID, 1, &shader_source, NULL);
-        glCompileShader(shaderID);
+        id = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(id, 1, &shader_source, NULL);
+        glCompileShader(id);
         {
             int success;
             char infoLog[512];
-            glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
+            glGetShaderiv(id, GL_COMPILE_STATUS, &success);
             if(!success){
-                glGetShaderInfoLog(shaderID, 512, NULL, infoLog);
+                glGetShaderInfoLog(id, 512, NULL, infoLog);
                 printf("VERTEX SHADER COMPILATION FAILED! \n%s\n", infoLog);
             }
             else{
@@ -86,25 +86,25 @@ namespace nuck{
         }
     }
     VertexShader::~VertexShader(){
-        if(shaderID != 0){
+        if(id != 0){
             puts("Killing VertexShader");
-            glDeleteShader(shaderID);
-            shaderID = 0
+            glDeleteShader(id);
+            id = 0;
         }
     }
 
 
 
     FragmentShader::FragmentShader(char** shader_source_addr){
-        shaderID = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(shaderID, 1, shader_source_addr, NULL);
-        glCompileShader(shaderID);
+        id = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(id, 1, shader_source_addr, NULL);
+        glCompileShader(id);
         {
             int success;
             char infoLog[512];
-            glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
+            glGetShaderiv(id, GL_COMPILE_STATUS, &success);
             if(!success){
-                glGetShaderInfoLog(shaderID, 512, NULL, infoLog);
+                glGetShaderInfoLog(id, 512, NULL, infoLog);
                 printf("FRAGMENT SHADER COMPILATION FAILED! \n%s\n", infoLog);
             }
             else{
@@ -114,15 +114,15 @@ namespace nuck{
     }
     FragmentShader::FragmentShader(char* filename){
         char* shader_source = read_file(filename);
-        shaderID = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(shaderID, 1, &shader_source, NULL);
-        glCompileShader(shaderID);
+        id = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(id, 1, &shader_source, NULL);
+        glCompileShader(id);
         {
             int success;
             char infoLog[512];
-            glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
+            glGetShaderiv(id, GL_COMPILE_STATUS, &success);
             if(!success){
-                glGetShaderInfoLog(shaderID, 512, NULL, infoLog);
+                glGetShaderInfoLog(id, 512, NULL, infoLog);
                 printf("FRAGMENT SHADER COMPILATION FAILED! \n%s\n", infoLog);
             }
             else{
@@ -131,26 +131,26 @@ namespace nuck{
         }
     }
     FragmentShader::~FragmentShader(){
-        if(shaderID != 0){
+        if(id != 0){
             puts("Killing FragmentShader");
-            glDeleteShader(shaderID);
-            shaderID = 0
+            glDeleteShader(id);
+            id = 0;
         }
     }
 
 
 
     ShaderProgram::ShaderProgram(VertexShader* vertex_shader, FragmentShader* fragment_shader){
-        shaderProgramID = glCreateProgram();
-        glAttachShader(shaderProgramID, vertex_shader->shaderID);
-        glAttachShader(shaderProgramID, fragment_shader->shaderID);
-        glLinkProgram(shaderProgramID);
+        id = glCreateProgram();
+        glAttachShader(id, vertex_shader->id);
+        glAttachShader(id, fragment_shader->id);
+        glLinkProgram(id);
         {
             int success;
             char infoLog[512];
-            glGetProgramiv(shaderProgramID, GL_LINK_STATUS, &success);
+            glGetProgramiv(id, GL_LINK_STATUS, &success);
             if(!success){
-                glGetProgramInfoLog(shaderProgramID, 512, NULL, infoLog);
+                glGetProgramInfoLog(id, 512, NULL, infoLog);
                 printf("SHADER PROGRAM LINK FAILED! \n%s\n", infoLog);
             }
             else{
@@ -159,14 +159,51 @@ namespace nuck{
         }
     }
     void ShaderProgram::activate(){
-        glUseProgram(shaderProgramID);
+        glUseProgram(id);
     }
 
 
 
+    VBO::VBO(){
+        glGenBuffers(1, &id);
+    }
+    VBO::VBO(float vertices[], size_t vertices_size, GLenum usage){
+        glGenBuffers(1, &id);
+        fill(vertices, vertices_size, usage);
+    }
+    void VBO::bind(){
+        glBindBuffer(GL_ARRAY_BUFFER, id);
+    }
+    void VBO::fill(float vertices[], size_t vertices_size, GLenum usage){
+        bind();
+        glBufferData(GL_ARRAY_BUFFER, vertices_size, vertices, usage);
+    }
 
 
 
+    VAO::VAO(){
+        glGenVertexArrays(1, &id);
+    }
+    void VAO::bind(){
+        glBindVertexArray(id);
+    }
+
+
+
+    EBO::EBO(){
+        glGenBuffers(1, &id);
+    }
+    EBO::EBO(uint32_t indices[], size_t indices_size, GLenum usage){
+        glGenBuffers(1, &id);
+        fill(indices, indices_size, usage);
+    }
+    void EBO::bind(){
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
+    }
+    void EBO::fill(uint32_t indices[], size_t indices_size, GLenum usage){
+        bind();
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size, indices, usage);
+    }
 
 
 

@@ -21,19 +21,30 @@ int main(int argc, char* argv[]){
 
     //data
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-         0.0f,  0.5f, 0.0f
+        0.5f, 0.5f, 0.0f, // top right
+        0.5f, -0.5f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f, // bottom left
+        -0.5f, 0.5f, 0.0f // top left
     };
-    uint32_t VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    unsigned int indices[] = { // note that we start from 0!
+        0, 1, 3, // first triangle
+        1, 2, 3 // second triangle
+    };
 
-    uint32_t VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
+    nuck::VBO VBO(vertices, sizeof(vertices), GL_STATIC_DRAW);
 
+    nuck::VAO VAO;
+    VAO.bind();
+
+    nuck::EBO EBO(indices, sizeof(indices), GL_STATIC_DRAW);
+
+
+    //vertex attribute position 0 in vertex shader
+    //size of vertex attribute(number of values)
+    //data type
+    //normalize data?
+    //stride(how many bytes to skip to go next attribute)
+    //offset(how many bytes to skip before reading first attribute)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
@@ -43,11 +54,13 @@ int main(int argc, char* argv[]){
         InputManager.process_input();
 
         //rendering
-        glClearColor(0.35686f, 0.80784f, 0.98431f, 1.0f);
+        //clear screen
+        glClearColor(0.3f, 0.6f, 0.9f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        VAO.bind();
+        EBO.bind();
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         WindowManager.refresh();
     }
