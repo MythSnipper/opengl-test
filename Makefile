@@ -1,4 +1,4 @@
-
+.PHONY: build include libs obj shaders src
 
 CXX = g++
 CXXFLAGS = -std=c++23 \
@@ -39,6 +39,11 @@ OBJ_WIN = $(wildcard obj/windows/*.o)
 TARGET = build/main
 TARGET_WIN = build/main.exe
 
+
+
+
+
+
 linux: $(TARGET) clean_obj
 
 $(TARGET): $(OBJ_COMP) #linking
@@ -67,6 +72,40 @@ obj/windows/%.o: src/%.cpp
 
 clean_obj_win:
 	rm $(OBJ_COMP_WIN)
+
+
+
+
+
+LIBCXXFLAGS := -std=c++23 \
+-Wall \
+-Wextra \
+-Iinclude \
+-O3
+
+GLAD := $(shell find src/glad -type f)
+IMGUI := $(shell find src/imgui -type f)
+LIB_TARGET := obj/linux
+LIB_TARGET_WIN := obj/windows
+
+libs: 
+	
+$(GLAD_TARGET):
+	$(CXX) $(LIBCXXFLAGS) -c $(GLAD) -o $(GLAD_TARGET)
+	strip $(GLAD_TARGET)
+
+$(GLAD_TARGET_WIN):
+	$(CXX_WIN) $(LIBCXXFLAGS) -c $(GLAD) -o $(GLAD_TARGET_WIN)
+	strip $(GLAD_TARGET_WIN)
+
+$(IMGUI_TARGET):
+	$(CXX) $(LIBCXXFLAGS) -c $(IMGUI) -o $(IMGUI_TARGET)
+	strip $(IMGUI_TARGET)
+
+$(IMGUI_TARGET_WIN):
+	$(CXX_WIN) $(LIBCXXFLAGS) -c $(IMGUI) -o $(IMGUI_TARGET_WIN)
+	strip $(IMGUI_TARGET_WIN)
+
 
 
 

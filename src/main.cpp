@@ -89,7 +89,7 @@ int main(int argc, char* argv[]){
 
         VBO.fill(vertices, sizeof(vertices), GL_DYNAMIC_DRAW);
 
-
+        
 
         //rendering
         //clear screen
