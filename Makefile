@@ -28,7 +28,7 @@ CXXFLAGS_WIN += -Wno-write-strings -Wno-old-style-cast -Wno-sign-conversion
 
 
 
-SRC := $(wildcard src/*.cpp)
+SRC := $(wildcard src/*.cpp) $(wildcard src/*.c)
 
 OBJ_COMP := $(patsubst src/%.cpp,obj/linux/%.o,$(SRC))
 OBJ_COMP_WIN := $(patsubst src/%.cpp,obj/windows/%.o,$(SRC))
@@ -72,6 +72,13 @@ obj/windows/%.o: src/%.cpp
 
 clean_obj_win:
 	rm $(OBJ_COMP_WIN)
+
+
+
+
+
+
+
 
 
 
