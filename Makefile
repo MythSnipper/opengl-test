@@ -16,8 +16,6 @@ CXXFLAGS_LIB := -std=c++23 \
 -Wno-old-style-cast \
 -Wno-sign-conversion \
 -Iinclude \
--Iinclude/imgui \
--Iinclude/imgui/backends \
 -O3
 CXXLIBS = -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl
 

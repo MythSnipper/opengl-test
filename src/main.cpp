@@ -11,14 +11,9 @@ int main(int argc, char* argv[]){
 
     nuck::InputManager InputManager(WindowManager.window);
 
-    nuck::VertexShader VertexShader("shaders/nuck.vert");
-    nuck::FragmentShader FragmentShader("shaders/nuck.frag");
-    nuck::ShaderProgram ShaderProgram(&VertexShader, &FragmentShader);
-    
+    nuck::ShaderProgram ShaderProgram("shaders/nuck.vert", "shaders/nuck.frag");
     ShaderProgram.activate();
-    VertexShader.~VertexShader();
-    FragmentShader.~FragmentShader();
-
+    
 
     //data
     float vertices[] = {
@@ -26,15 +21,19 @@ int main(int argc, char* argv[]){
         -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
         0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
     };
-    uint32_t indices[] = { // note that we start from 0! //didn't ask
+    uint32_t indices[] = {
         0, 1, 2
     };
 
     nuck::VAO VAO;
     VAO.bind();
 
+
     nuck::VBO VBO(vertices, sizeof(vertices), GL_DYNAMIC_DRAW);
     VBO.bind();
+
+    nuck::EBO EBO(indices, sizeof(indices), GL_STATIC_DRAW);
+    EBO.bind();
 
     //vertex attribute position in vertex shader
     //size of vertex attribute(number of values)
@@ -48,12 +47,11 @@ int main(int argc, char* argv[]){
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    nuck::EBO EBO(indices, sizeof(indices), GL_STATIC_DRAW);
-    EBO.bind();
-
     nuck::GL GL;
     GL.wireframe_mode(false);
     GL.info();
+
+
 
     float speed = 0.01f;
     float spd = 1;
@@ -62,16 +60,16 @@ int main(int argc, char* argv[]){
         //input
         InputManager.process_input();
         if(InputManager.key_down(GLFW_KEY_A)){
-            vertices[6] -= speed;
+            vertices[12] -= speed;
         }
         if(InputManager.key_down(GLFW_KEY_D)){
-            vertices[6] += speed;
+            vertices[12] += speed;
         }
         if(InputManager.key_down(GLFW_KEY_W)){
-            vertices[7] += speed;
+            vertices[13] += speed;
         }
         if(InputManager.key_down(GLFW_KEY_S)){
-            vertices[7] -= speed;
+            vertices[13] -= speed;
         }
         if(InputManager.key_down(GLFW_KEY_E)){
             spd += 0.02;
@@ -79,17 +77,17 @@ int main(int argc, char* argv[]){
         if(InputManager.key_down(GLFW_KEY_Q)){
             spd -= 0.02;
         }
-        if(vertices[6] < -1){
-            vertices[6] = -1.0f;
+        if(vertices[12] < -1){
+            vertices[12] = -1.0f;
         }
-        if(vertices[6] > 1){
-            vertices[6] = 1.0f;
+        if(vertices[12] > 1){
+            vertices[12] = 1.0f;
         }
-        if(vertices[7] < -0.99){
-            vertices[7] = -0.99f;
+        if(vertices[13] < -0.99){
+            vertices[13] = -0.99f;
         }
-        if(vertices[7] > 0.99){
-            vertices[7] = 0.99f;
+        if(vertices[13] > 0.99){
+            vertices[13] = 0.99f;
         }
         if(spd > 100000){
             spd = 100000.0f;
@@ -97,10 +95,8 @@ int main(int argc, char* argv[]){
         if(spd < 0.01){
             spd = 0.01f;
         }
-
         VBO.fill(vertices, sizeof(vertices), GL_DYNAMIC_DRAW);
 
-        
 
         //rendering
         //clear screen
@@ -109,12 +105,18 @@ int main(int argc, char* argv[]){
 
         //set rendering color using uniform
         ShaderProgram.activate();
+        GLenum err;
+    while((err = glGetError()) != GL_NO_ERROR) {
+        std::cout << "\n\n\n\n\n\nOpenGL error: " << err << std::endl;
+    }
         VAO.bind();
+        VBO.bind();
         EBO.bind();
-        glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 
         WindowManager.refresh();
+        while(true);
     }
 
     return 0;

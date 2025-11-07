@@ -7,6 +7,10 @@
 #include <cmath>
 #include <fstream>
 
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -68,6 +72,8 @@ namespace nuck{
         uint32_t id;
 
         ShaderProgram(VertexShader* vertex_shader, FragmentShader* fragment_shader);
+        ShaderProgram(char** vert_source, char** frag_source);
+        ShaderProgram(char* vert_file, char* frag_file);
         void activate();
         private:
         

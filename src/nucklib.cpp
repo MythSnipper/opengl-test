@@ -167,6 +167,17 @@ namespace nuck{
             }
         }
     }
+    ShaderProgram::ShaderProgram(char** vert_source, char** frag_source){
+        VertexShader VertexShader(vert_source);
+        FragmentShader FragmentShader(frag_source);
+        ShaderProgram(&VertexShader, &FragmentShader);
+
+    }
+    ShaderProgram::ShaderProgram(char* vert_file, char* frag_file){
+        VertexShader VertexShader(vert_file);
+        FragmentShader FragmentShader(frag_file);
+        ShaderProgram(&VertexShader, &FragmentShader);
+    }
     void ShaderProgram::activate(){
         glUseProgram(id);
     }
