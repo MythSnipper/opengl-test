@@ -70,6 +70,7 @@ namespace nuck{
             if(!success){
                 glGetShaderInfoLog(id, 512, NULL, infoLog);
                 printf("VERTEX SHADER COMPILATION FAILED! \n%s\n", infoLog);
+                throw std::runtime_error(" ^ ^");
             }
             else{
                 puts("VERTEX SHADER COMPILED SUCCESSFULLY");
@@ -88,6 +89,7 @@ namespace nuck{
             if(!success){
                 glGetShaderInfoLog(id, 512, NULL, infoLog);
                 printf("VERTEX SHADER COMPILATION FAILED! \n%s\n", infoLog);
+                throw std::runtime_error(" ^ ^");
             }
             else{
                 puts("VERTEX SHADER COMPILED SUCCESSFULLY");
@@ -115,6 +117,7 @@ namespace nuck{
             if(!success){
                 glGetShaderInfoLog(id, 512, NULL, infoLog);
                 printf("FRAGMENT SHADER COMPILATION FAILED! \n%s\n", infoLog);
+                throw std::runtime_error(" ^ ^");
             }
             else{
                 puts("FRAGMENT SHADER COMPILED SUCCESSFULLY");
@@ -133,6 +136,7 @@ namespace nuck{
             if(!success){
                 glGetShaderInfoLog(id, 512, NULL, infoLog);
                 printf("FRAGMENT SHADER COMPILATION FAILED! \n%s\n", infoLog);
+                throw std::runtime_error(" ^ ^");
             }
             else{
                 puts("FRAGMENT SHADER COMPILED SUCCESSFULLY");
@@ -161,6 +165,7 @@ namespace nuck{
             if(!success){
                 glGetProgramInfoLog(id, 512, NULL, infoLog);
                 printf("SHADER PROGRAM LINK FAILED! \n%s\n", infoLog);
+                throw std::runtime_error(" ^ ^");
             }
             else{
                 puts("SHADER PROGRAM LINKED SUCCESSFULLY");
@@ -168,15 +173,104 @@ namespace nuck{
         }
     }
     ShaderProgram::ShaderProgram(char** vert_source, char** frag_source){
-        VertexShader VertexShader(vert_source);
-        FragmentShader FragmentShader(frag_source);
-        ShaderProgram(&VertexShader, &FragmentShader);
+        VertexShader vert(vert_source);
+        FragmentShader frag(frag_source);
 
+        id = glCreateProgram();
+        glAttachShader(id, vert.id);
+        glAttachShader(id, frag.id);
+        glLinkProgram(id);
+        {
+            int success;
+            char infoLog[512];
+            glGetProgramiv(id, GL_LINK_STATUS, &success);
+            if(!success){
+                glGetProgramInfoLog(id, 512, NULL, infoLog);
+                printf("SHADER PROGRAM LINK FAILED! \n%s\n", infoLog);
+                throw std::runtime_error(" ^ ^");
+            }
+            else{
+                puts("SHADER PROGRAM LINKED SUCCESSFULLY");
+            }
+        }
+        vert.~VertexShader();
+        frag.~FragmentShader();
     }
     ShaderProgram::ShaderProgram(char* vert_file, char* frag_file){
-        VertexShader VertexShader(vert_file);
-        FragmentShader FragmentShader(frag_file);
-        ShaderProgram(&VertexShader, &FragmentShader);
+        VertexShader vert(vert_file);
+        FragmentShader frag(frag_file);
+
+        id = glCreateProgram();
+        glAttachShader(id, vert.id);
+        glAttachShader(id, frag.id);
+        glLinkProgram(id);
+        {
+            int success;
+            char infoLog[512];
+            glGetProgramiv(id, GL_LINK_STATUS, &success);
+            if(!success){
+                glGetProgramInfoLog(id, 512, NULL, infoLog);
+                printf("SHADER PROGRAM LINK FAILED! \n%s\n", infoLog);
+                throw std::runtime_error(" ^ ^");
+            }
+            else{
+                puts("SHADER PROGRAM LINKED SUCCESSFULLY");
+            }
+        }
+        vert.~VertexShader();
+        frag.~FragmentShader();
+    }
+    void ShaderProgram::set_bool(char* name, std::initializer_list<int> values){
+        set_int(name, values);
+    }
+    void ShaderProgram::set_bool(UniformID uid, std::initializer_list<int> values){
+        set_int(uid, values);
+    }
+    void ShaderProgram::set_int(char* name, std::initializer_list<int> values){
+        set_int(glGetUniformLocation(id, name), values);
+    }
+    void ShaderProgram::set_int(UniformID uid, std::initializer_list<int> values){
+        const int* veeronica = values.begin();
+        switch(values.size()){
+            case 1:
+                glUniform1i(uid, veeronica[0]);
+            break;
+            case 2:
+                glUniform2i(uid, veeronica[0], veeronica[1]);
+            break;
+            case 3:
+                glUniform3i(uid, veeronica[0], veeronica[1], veeronica[2]);
+            break;
+            case 4:
+                glUniform4i(uid, veeronica[0], veeronica[1], veeronica[2], veeronica[3]);
+            break;
+            default:
+                printf("Invalid number of values to set uniform\nExpected 1-4, got %d\n", values.size());
+                throw std::runtime_error(" ^ ^");
+        }
+    }
+    void ShaderProgram::set_float(char* name, std::initializer_list<float> values){
+        set_float(glGetUniformLocation(id, name), values);
+    }
+    void ShaderProgram::set_float(UniformID uid, std::initializer_list<float> values){
+        const float* veeronica = values.begin();
+        switch(values.size()){
+            case 1:
+                glUniform1f(uid, veeronica[0]);
+            break;
+            case 2:
+                glUniform2f(uid, veeronica[0], veeronica[1]);
+            break;
+            case 3:
+                glUniform3f(uid, veeronica[0], veeronica[1], veeronica[2]);
+            break;
+            case 4:
+                glUniform4f(uid, veeronica[0], veeronica[1], veeronica[2], veeronica[3]);
+            break;
+            default:
+                printf("Invalid number of values to set uniform\nExpected 1-4, got %d\n", values.size());
+                throw std::runtime_error(" ^ ^");
+        }
     }
     void ShaderProgram::activate(){
         glUseProgram(id);
@@ -232,15 +326,38 @@ namespace nuck{
 
 
 
-    void GL::wireframe_mode(bool enable){
+    void GL::set_wireframe_mode(bool enable){
+        wireframe_mode = enable;
         glPolygonMode(GL_FRONT_AND_BACK, (enable) ? GL_LINE : GL_FILL);
     }
+    void GL::set_background_color(uint8_t r, uint8_t g, uint8_t b){
+        background_color = {r/255.0f, g/255.0f, b/255.0f, 1.0f};
+    }
+    void GL::set_background_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a){
+        background_color = {r/255.0f, g/255.0f, b/255.0f, a/255.0f};
+    }
+    void GL::set_background_color(float r, float g, float b){
+        background_color = {r, g, b};
+    }
+    void GL::set_background_color(float r, float g, float b, float a){
+        background_color = {r, g, b, a};
+    }
+    void GL::set_background_color(uint32_t color){
+        background_color = {((color >> 16) & 0xFF)/255.0f, ((color >> 8) & 0xFF)/255.0f, (color & 0xFF)/255.0f, 1.0f};
+    }
     void GL::info(){
+        for(int i=0;i<20;i++)printf("-");
+        puts("");
+        printf("OS: ");
+        #ifdef _WIN32
+            printf("windows\n");
+        #else
+            printf("linux\n");
+        #endif
         int nrAttributes;
         glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
         printf("Number of vertex attributes available: %d\n", nrAttributes);
     }
-    
 
 
 
@@ -268,6 +385,28 @@ namespace nuck{
 
         return buf;
     }
+    template<typename T> T clamp(T num, T min, T max){
+        if(num < min){
+            return min;
+        }
+        else if(num > max){
+            return max;
+        }
+        return num;
+    }
+    template int clamp<int>(int, int, int);
+    template float clamp<float>(float, float, float);
+
+    template<typename T> void clamp(T* num, T min, T max){
+        if(*num < min){
+            *num = min;
+        }
+        else if(*num > max){
+            *num = max;
+        }
+    }
+    template void clamp<int>(int*, int, int);
+    template void clamp<float>(float*, float, float);
 
 
 }

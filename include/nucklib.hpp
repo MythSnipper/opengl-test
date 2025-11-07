@@ -17,6 +17,21 @@
 
 
 namespace nuck{
+    struct Color{
+        float r;
+        float g;
+        float b;
+        float a = 1.0f;
+    };
+    struct ColorRGBA{
+        uint8_t r;
+        uint8_t g;
+        uint8_t b;
+        uint8_t a;
+    };
+    typedef int UniformID;
+
+
     class WindowManager{
         public:
         GLFWwindow* window;
@@ -74,6 +89,12 @@ namespace nuck{
         ShaderProgram(VertexShader* vertex_shader, FragmentShader* fragment_shader);
         ShaderProgram(char** vert_source, char** frag_source);
         ShaderProgram(char* vert_file, char* frag_file);
+        void set_bool(char* name, std::initializer_list<int> values);
+        void set_bool(UniformID uid, std::initializer_list<int> values);
+        void set_int(char* name, std::initializer_list<int> values);
+        void set_int(UniformID uid, std::initializer_list<int> values);
+        void set_float(char* name, std::initializer_list<float> values);
+        void set_float(UniformID uid, std::initializer_list<float> values);
         void activate();
         private:
         
@@ -118,22 +139,29 @@ namespace nuck{
     };
     class GL{
         public:
-        void wireframe_mode(bool enable);
+        bool wireframe_mode = false;
+        Color background_color;
+
+        void set_wireframe_mode(bool enable);
+        void set_background_color(uint8_t r, uint8_t g, uint8_t b);
+        void set_background_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+        void set_background_color(float r, float g, float b);
+        void set_background_color(float r, float g, float b, float a);
+        void set_background_color(uint32_t color);
         void info();
 
     };
 
 
+    //GL related
 
 
 
 
-    
+    //others
     char* read_file(const char* filename);
-
-
-
-
+    template<typename T> T clamp(T num, T min, T max);
+    template<typename T> void clamp(T* num, T min, T max);
 
 }
 

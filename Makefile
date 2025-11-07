@@ -63,6 +63,9 @@ OBJ_WIN = $(shell find obj/windows -type f)
 TARGET := build/main
 TARGET_WIN := build/main.exe
 
+#debug or no
+DEBUG ?= 0
+
 
 $(info SRC: $(SRC))
 $(info SRC_LIB: $(SRC_LIB))
@@ -84,7 +87,9 @@ linux_fast: $(OBJ_LIB)
 $(TARGET): $(OBJ_COMP) #linking
 	$(info Linking program for linux)
 	$(CXX) $(OBJ) -o $(TARGET) $(CXXLIBS)
+ifeq ($(DEBUG),0)
 	strip $(TARGET)
+endif
 
 #compiling
 $(OBJ_COMP):
@@ -138,7 +143,9 @@ win_fast: $(OBJ_LIB_WIN)
 $(TARGET_WIN): $(OBJ_COMP_WIN) #linking
 	$(info Linking program for windows)
 	$(CXX_WIN) $(OBJ_WIN) -o $(TARGET_WIN) $(CXXLIBS_WIN)
+ifeq ($(DEBUG),0)
 	strip $(TARGET_WIN)
+endif
 
 #compiling
 $(OBJ_COMP_WIN):
