@@ -74,13 +74,12 @@ $(info OBJ_LIB: $(OBJ_LIB))
 $(info OBJ_LIB_WIN: $(OBJ_LIB_WIN));
 $(info )
 
-.PHONY: build include libs obj shaders src
+.PHONY: build include libs obj shaders src $(TARGET) $(OBJ_COMP)
 
 linux: $(OBJ_LIB) $(TARGET)
 linux_refresh: $(OBJ_LIB) linux_fast
 
 linux_fast: $(OBJ_LIB)
-	rm -f obj/linux/main.o
 	$(CXX) $(CXXFLAGS) -c src/main.cpp -o obj/linux/main.o
 	$(CXX) $(OBJ) -o $(TARGET) $(CXXLIBS)
 
@@ -135,7 +134,6 @@ win: $(OBJ_LIB_WIN) $(TARGET_WIN)
 win_refresh: $(OBJ_LIB_WIN) win_fast
 
 win_fast: $(OBJ_LIB_WIN)
-	rm -f obj/windows/main.o
 	$(CXX_WIN) $(CXXFLAGS_WIN) -c src/main.cpp -o obj/windows/main.o
 	$(CXX_WIN) $(OBJ_WIN) -o $(TARGET_WIN) $(CXXLIBS_WIN)
 

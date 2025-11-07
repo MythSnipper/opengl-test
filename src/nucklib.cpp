@@ -224,6 +224,11 @@ namespace nuck{
     void GL::wireframe_mode(bool enable){
         glPolygonMode(GL_FRONT_AND_BACK, (enable) ? GL_LINE : GL_FILL);
     }
+    void GL::info(){
+        int nrAttributes;
+        glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+        printf("Number of vertex attributes available: %d\n", nrAttributes);
+    }
     
 
 

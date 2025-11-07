@@ -7,7 +7,7 @@ int main(int argc, char* argv[]){
         std::cout << "Running on linux\n";
     #endif
 
-    nuck::WindowManager WindowManager(3, 3, 800, 600, "nuckGL");
+    nuck::WindowManager WindowManager(3, 3, 1920, 1080, "nuckGL");
 
     nuck::InputManager InputManager(WindowManager.window);
 
@@ -19,21 +19,15 @@ int main(int argc, char* argv[]){
     VertexShader.~VertexShader();
     FragmentShader.~FragmentShader();
 
+
     //data
     float vertices[] = {
-        -0.9f, -0.9f, 0.0f, //lower left corner
-        -0.5f, 0.0f, 0.0f,  //left
-        0.0f, 0.0f, 0.0f,   //middle
-        0.5f, 0.0f, 0.0f,   //right
-        0.9f, -0.9f, 0.0f,  //lower right corner
-        -0.9f, 0.9f, 0.0f,  //upper left corner
-        0.9f, 0.9f, 0.0f,   //upper right corner
+        0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
     };
-    unsigned int indices[] = { // note that we start from 0! //didn't ask
-        0, 1, 2,
-        4, 3, 2,
-        5, 1, 2,
-        6, 3, 2,
+    uint32_t indices[] = { // note that we start from 0! //didn't ask
+        0, 1, 2
     };
 
     nuck::VAO VAO;
@@ -42,22 +36,27 @@ int main(int argc, char* argv[]){
     nuck::VBO VBO(vertices, sizeof(vertices), GL_DYNAMIC_DRAW);
     VBO.bind();
 
-    //vertex attribute position 0 in vertex shader
+    //vertex attribute position in vertex shader
     //size of vertex attribute(number of values)
     //data type
     //normalize data?
     //stride(how many bytes to skip to go next attribute)
     //offset(how many bytes to skip before reading first attribute)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     nuck::EBO EBO(indices, sizeof(indices), GL_STATIC_DRAW);
     EBO.bind();
 
     nuck::GL GL;
     GL.wireframe_mode(false);
+    GL.info();
 
-    float speed = 0.02f;
+    float speed = 0.01f;
+    float spd = 1;
     //Main loop
     while(!WindowManager.window_should_exit()){
         //input
@@ -74,6 +73,12 @@ int main(int argc, char* argv[]){
         if(InputManager.key_down(GLFW_KEY_S)){
             vertices[7] -= speed;
         }
+        if(InputManager.key_down(GLFW_KEY_E)){
+            spd += 0.02;
+        }
+        if(InputManager.key_down(GLFW_KEY_Q)){
+            spd -= 0.02;
+        }
         if(vertices[6] < -1){
             vertices[6] = -1.0f;
         }
@@ -86,6 +91,12 @@ int main(int argc, char* argv[]){
         if(vertices[7] > 0.99){
             vertices[7] = 0.99f;
         }
+        if(spd > 100000){
+            spd = 100000.0f;
+        }
+        if(spd < 0.01){
+            spd = 0.01f;
+        }
 
         VBO.fill(vertices, sizeof(vertices), GL_DYNAMIC_DRAW);
 
@@ -96,10 +107,11 @@ int main(int argc, char* argv[]){
         glClearColor(0.3f, 0.6f, 0.9f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        //set rendering color using uniform
         ShaderProgram.activate();
         VAO.bind();
         EBO.bind();
-        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]), GL_UNSIGNED_INT, 0);
 
 
         WindowManager.refresh();

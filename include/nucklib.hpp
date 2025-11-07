@@ -4,7 +4,7 @@
 
 #include <cstdio>
 #include <cstdlib>
-
+#include <cmath>
 #include <fstream>
 
 #include <glad/glad.h>
@@ -113,7 +113,7 @@ namespace nuck{
     class GL{
         public:
         void wireframe_mode(bool enable);
-
+        void info();
 
     };
 
