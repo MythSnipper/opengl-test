@@ -6,6 +6,13 @@ int main(int argc, char* argv[]){
 
     nuck::InputManager InputManager(WindowManager.window);
 
+    //must do configs
+    nuck::GL GL;
+    GL.set_wireframe_mode(false);
+    GL.set_background_color(0x104C7E);
+
+    stbi_set_flip_vertically_on_load(true);
+
     nuck::ShaderProgram ShaderProgram("shaders/nuck.vert", "shaders/nuck.frag");
     ShaderProgram.activate();
 
@@ -45,7 +52,6 @@ int main(int argc, char* argv[]){
     nuck::EBO EBO(indices, sizeof(indices), GL_STATIC_DRAW);
     EBO.bind();
 
-
     //texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -56,12 +62,14 @@ int main(int argc, char* argv[]){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR); //linear bitmap, nearest filtering
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //linear filtering
 
-    nuck::Texture2D texture1("textures/niko.png");
+    nuck::Texture2D texture0("textures/flandre_scarlet.png", GL_RGBA);
+    texture0.bind();
+
+    nuck::Texture2D texture1("textures/niko.png", GL_RGBA);
     texture1.bind();
 
-    nuck::GL GL;
-    GL.set_wireframe_mode(false);
-    GL.set_background_color(0x104C7E);
+    ShaderProgram.set_int("texture0", {0});
+    ShaderProgram.set_int("texture1", {1});
 
     float speed = 0.01f;
     float spd = 1;
@@ -95,12 +103,15 @@ int main(int argc, char* argv[]){
 
         VBO.fill(vertices, sizeof(vertices), GL_DYNAMIC_DRAW);
 
+
+        
         //rendering
         //clear screen
         glClear(GL_COLOR_BUFFER_BIT);
 
         ShaderProgram.activate();
-        texture1.bind_texture_unit(GL_TEXTURE0);
+        texture0.bind_texture_unit(GL_TEXTURE0);
+        texture1.bind_texture_unit(GL_TEXTURE1);
         VAO.bind();
         VBO.bind();
         EBO.bind();

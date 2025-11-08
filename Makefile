@@ -6,7 +6,6 @@ CXXFLAGS = -std=c++23 \
 -Wno-write-strings \
 -Wno-old-style-cast \
 -Wno-sign-conversion \
--Wno-format \
 -Iinclude \
 -O0 \
 -g
@@ -16,7 +15,6 @@ CXXFLAGS_LIB := -std=c++23 \
 -Wno-write-strings \
 -Wno-old-style-cast \
 -Wno-sign-conversion \
--Wno-format \
 -Iinclude \
 -O3
 CXXLIBS = -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl
@@ -187,19 +185,19 @@ $(OBJ_LIB_WIN):
 
 
 clean:
-	rm -f $(OBJ_COMP)
-	rm -f $(OBJ_COMP_WIN)
+	rm -f $(TARGET)
+	rm -f $(TARGET_WIN)
 
 nuke:
 	rm -rf obj/linux/*
 	rm -rf obj/windows/*
 
 
-test: linux run
-fast: linux_fast run
+test: linux $(TARGET) run
+fast: linux_fast $(TARGET) run
 
-test_win: win run_win
-fast_win: win_fast run_win
+test_win: win $(TARGET_WIN) run_win
+fast_win: win_fast $(TARGET_WIN) run_win
 
 run:
 	$(TARGET)
