@@ -1,3 +1,4 @@
+#define STB_IMAGE_IMPLEMENTATION
 #include "nucklib.hpp"
 
 namespace nuck{
@@ -326,24 +327,66 @@ namespace nuck{
 
 
 
+    class Texture2D{
+        public:
+        uint32_t id;
+
+        Texture2D(char* file_path, GLenum internalFormat = GL_RGBA){
+
+            //load texture
+            uint8_t *data = stbi_load(file_path, &texture_width, &texture_height, &color_channels_count, 0);
+            if(!data){
+                printf("Failed to load texture image %s\n", file_path);
+                throw std::runtime_error(" ^ ^");
+            }
+            if(color_channels_count != 3 && color_channels_count != 4){
+                printf("Invalid color channels count for texture image: %d\n", color_channels_count);
+                throw std::runtime_error(" ^ ^");
+            }
+
+            glGenTextures(1, &id);
+            bind();
+
+            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, (color_channels_count == 4) ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+
+            stbi_image_free(data);
+        }
+        void bind(){
+            glBindTexture(GL_TEXTURE_2D, id);
+        }
+
+        private:
+        int texture_width;
+        int texture_height;
+        int color_channels_count;
+    };
+
+
+
     void GL::set_wireframe_mode(bool enable){
         wireframe_mode = enable;
         glPolygonMode(GL_FRONT_AND_BACK, (enable) ? GL_LINE : GL_FILL);
     }
     void GL::set_background_color(uint8_t r, uint8_t g, uint8_t b){
         background_color = {r/255.0f, g/255.0f, b/255.0f, 1.0f};
+        glClearColor(background_color.r, background_color.g, background_color.b, background_color.a);
     }
     void GL::set_background_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a){
         background_color = {r/255.0f, g/255.0f, b/255.0f, a/255.0f};
+        glClearColor(background_color.r, background_color.g, background_color.b, background_color.a);
     }
     void GL::set_background_color(float r, float g, float b){
         background_color = {r, g, b};
+        glClearColor(background_color.r, background_color.g, background_color.b, background_color.a);
     }
     void GL::set_background_color(float r, float g, float b, float a){
         background_color = {r, g, b, a};
+        glClearColor(background_color.r, background_color.g, background_color.b, background_color.a);
     }
     void GL::set_background_color(uint32_t color){
         background_color = {((color >> 16) & 0xFF)/255.0f, ((color >> 8) & 0xFF)/255.0f, (color & 0xFF)/255.0f, 1.0f};
+        glClearColor(background_color.r, background_color.g, background_color.b, background_color.a);
     }
     void GL::info(){
         for(int i=0;i<20;i++)printf("-");

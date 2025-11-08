@@ -5,8 +5,11 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
+
+#include <iostream>
 #include <fstream>
 
+#include <stb_image.h>
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
@@ -50,14 +53,13 @@ namespace nuck{
     };
     class InputManager{
         public:
-        GLFWwindow* window;
 
         InputManager(GLFWwindow* window);
         void process_input();
         bool key_down(uint32_t key_code);
 
         private:
-
+        GLFWwindow* window;
 
     };
     class VertexShader{
@@ -149,7 +151,9 @@ namespace nuck{
         void set_background_color(float r, float g, float b, float a);
         void set_background_color(uint32_t color);
         void info();
+        private:
 
+        
     };
 
 

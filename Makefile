@@ -75,7 +75,7 @@ $(info OBJ_LIB: $(OBJ_LIB))
 $(info OBJ_LIB_WIN: $(OBJ_LIB_WIN));
 $(info )
 
-.PHONY: build include libs obj shaders src $(TARGET) $(OBJ_COMP)
+.PHONY: build include libs obj shaders src $(TARGET) $(OBJ_COMP) $(TARGET_WIN) $(OBJ_COMP_WIN)
 
 linux: $(OBJ_LIB) $(TARGET)
 linux_refresh: $(OBJ_LIB) linux_fast
