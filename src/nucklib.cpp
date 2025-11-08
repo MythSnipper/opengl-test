@@ -26,7 +26,7 @@ namespace nuck{
             glfwTerminate();
         }
     }
-    void WindowManager::window_framebuffer_size_callback(GLFWwindow* window, int window_width, int window_height){
+    void WindowManager::window_framebuffer_size_callback(GLFWwindow*, int window_width, int window_height){
         printf("Framebuffer size changed to: %dx%d!\n", window_width, window_height);
         glViewport(0, 0, window_width, window_height);
     }
@@ -327,40 +327,36 @@ namespace nuck{
 
 
 
-    class Texture2D{
-        public:
-        uint32_t id;
-
-        Texture2D(char* file_path, GLenum internalFormat = GL_RGBA){
-
-            //load texture
-            uint8_t *data = stbi_load(file_path, &texture_width, &texture_height, &color_channels_count, 0);
-            if(!data){
-                printf("Failed to load texture image %s\n", file_path);
-                throw std::runtime_error(" ^ ^");
-            }
-            if(color_channels_count != 3 && color_channels_count != 4){
-                printf("Invalid color channels count for texture image: %d\n", color_channels_count);
-                throw std::runtime_error(" ^ ^");
-            }
-
-            glGenTextures(1, &id);
-            bind();
-
-            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, (color_channels_count == 4) ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D);
-
-            stbi_image_free(data);
+    Texture2D::Texture2D(char* file_path, GLenum internal_format){
+        //load texture
+        uint8_t *data = stbi_load(file_path, &texture_width, &texture_height, &color_channels_count, 0);
+        if(!data){
+            printf("Failed to load texture image %s\n", file_path);
+            throw std::runtime_error(" ^ ^");
         }
-        void bind(){
-            glBindTexture(GL_TEXTURE_2D, id);
+        if(color_channels_count != 3 && color_channels_count != 4){
+            printf("Invalid color channels count for texture image: %d\n", color_channels_count);
+            throw std::runtime_error(" ^ ^");
+        }
+        if(internal_format == 0){
+            internal_format = (color_channels_count == 4) ? GL_RGBA : GL_RGB;
         }
 
-        private:
-        int texture_width;
-        int texture_height;
-        int color_channels_count;
-    };
+        glGenTextures(1, &id);
+        bind();
+
+        glTexImage2D(GL_TEXTURE_2D, 0, internal_format, texture_width, texture_height, 0, (color_channels_count == 4) ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        stbi_image_free(data);
+    }
+    void Texture2D::bind(){
+        glBindTexture(GL_TEXTURE_2D, id);
+    }
+    void Texture2D::bind_texture_unit(GLenum texture_unit){
+        glActiveTexture(texture_unit);
+        glBindTexture(GL_TEXTURE_2D, id);
+    }
 
 
 

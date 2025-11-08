@@ -56,7 +56,8 @@ int main(int argc, char* argv[]){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR); //linear bitmap, nearest filtering
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //linear filtering
 
-    
+    nuck::Texture2D texture1("textures/niko.png");
+    texture1.bind();
 
     nuck::GL GL;
     GL.set_wireframe_mode(false);
@@ -99,8 +100,7 @@ int main(int argc, char* argv[]){
         glClear(GL_COLOR_BUFFER_BIT);
 
         ShaderProgram.activate();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        texture1.bind_texture_unit(GL_TEXTURE0);
         VAO.bind();
         VBO.bind();
         EBO.bind();

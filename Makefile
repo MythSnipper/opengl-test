@@ -6,6 +6,7 @@ CXXFLAGS = -std=c++23 \
 -Wno-write-strings \
 -Wno-old-style-cast \
 -Wno-sign-conversion \
+-Wno-format \
 -Iinclude \
 -O0 \
 -g
@@ -15,6 +16,7 @@ CXXFLAGS_LIB := -std=c++23 \
 -Wno-write-strings \
 -Wno-old-style-cast \
 -Wno-sign-conversion \
+-Wno-format \
 -Iinclude \
 -O3
 CXXLIBS = -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl
@@ -66,6 +68,13 @@ TARGET_WIN := build/main.exe
 #debug or no
 DEBUG ?= 0
 
+RED    := \033[31m
+GREEN  := \033[32m
+YELLOW := \033[33m
+BLUE   := \033[34m
+PURPLE := \033[35m
+CYAN   := \033[36m
+RESET  := \033[0m
 
 $(info SRC: $(SRC))
 $(info SRC_LIB: $(SRC_LIB))
@@ -77,54 +86,51 @@ $(info )
 
 .PHONY: build include libs obj shaders src $(TARGET) $(OBJ_COMP) $(TARGET_WIN) $(OBJ_COMP_WIN)
 
-linux: $(OBJ_LIB) $(TARGET)
-linux_refresh: $(OBJ_LIB) linux_fast
+linux: $(OBJ_LIB)
+	@echo -e "$(PURPLE)Compiling program for linux$(RESET)"
+	@for obj in $(OBJ_COMP); do \
+		src=$$(echo $$obj | sed 's|obj/linux/|src/|' | sed 's|\.o$$||'); \
+		if [ -f "$${src}.cpp" ]; then \
+			src="$${src}.cpp"; \
+		elif [ -f "$${src}.c" ]; then \
+			src="$${src}.c"; \
+		else \
+			echo -e "$(RED)Error: No matching source for $$obj$(RESET)"; \
+			exit 1; \
+		fi; \
+		echo -e "$(CYAN)Compiling $$src -> $$obj$(RESET)"; \
+		mkdir -p $$(dirname $$obj); \
+		time $(CXX) $(CXXFLAGS) -c $$src -o $$obj; \
+	done
 
 linux_fast: $(OBJ_LIB)
+	@echo -e "$(PURPLE)Compiling program for linux$(RESET)"
 	$(CXX) $(CXXFLAGS) -c src/main.cpp -o obj/linux/main.o
 	$(CXX) $(OBJ) -o $(TARGET) $(CXXLIBS)
 
-$(TARGET): $(OBJ_COMP) #linking
-	$(info Linking program for linux)
+$(TARGET): $(OBJ_COMP) $(OBJ_LIB)#linking
+	@echo -e "$(PURPLE)Linking program for linux$(RESET)"
 	$(CXX) $(OBJ) -o $(TARGET) $(CXXLIBS)
 ifeq ($(DEBUG),0)
 	strip $(TARGET)
 endif
 
-#compiling
-$(OBJ_COMP):
-	$(info Compiling program for linux)
-	for obj in $(OBJ_COMP); do \
-		src=$$(echo $$obj | sed 's|obj/linux/|src/|' | sed 's|\.o$$||'); \
-		if [ -f "$${src}.cpp" ]; then \
-			src="$${src}.cpp"; \
-		elif [ -f "$${src}.c" ]; then \
-			src="$${src}.c"; \
-		else \
-			echo "Error: No matching source for $$obj"; \
-			exit 1; \
-		fi; \
-		echo "Compiling $$src -> $$obj"; \
-		mkdir -p $$(dirname $$obj); \
-		$(CXX) $(CXXFLAGS) -c $$src -o $$obj; \
-	done
-
 #compiling libs
 $(OBJ_LIB):
-	$(info Compiling libs for linux)
-	for obj in $(OBJ_LIB); do \
+	@echo -e "$(PURPLE)Compiling libs for linux$(RESET)"
+	@for obj in $(OBJ_LIB); do \
 		src=$$(echo $$obj | sed 's|obj/linux/|src/|' | sed 's|\.o$$||'); \
 		if [ -f "$${src}.cpp" ]; then \
 			src="$${src}.cpp"; \
 		elif [ -f "$${src}.c" ]; then \
 			src="$${src}.c"; \
 		else \
-			echo "Error: No matching source for $$obj"; \
+			echo -e "$(RED)Error: No matching source for $$obj$(RESET)"; \
 			exit 1; \
 		fi; \
-		echo "Compiling $$src -> $$obj"; \
+		echo -e "$(CYAN)Compiling $$src -> $$obj$(RESET)"; \
 		mkdir -p $$(dirname $$obj); \
-		$(CXX) $(CXXFLAGS_LIB) -c $$src -o $$obj; \
+		time $(CXX) $(CXXFLAGS_LIB) -c $$src -o $$obj; \
 	done
 
 
@@ -133,54 +139,50 @@ $(OBJ_LIB):
 
 
 
-win: $(OBJ_LIB_WIN) $(TARGET_WIN)
-win_refresh: $(OBJ_LIB_WIN) win_fast
+win: $(OBJ_LIB_WIN)
+	@echo -e "$(PURPLE)Compiling program for windows$(RESET)"
+	@for obj in $(OBJ_COMP_WIN); do \
+		src=$$(echo $$obj | sed 's|obj/windows/|src/|' | sed 's|\.o$$||'); \
+		if [ -f "$${src}.cpp" ]; then \
+			src="$${src}.cpp"; \
+		elif [ -f "$${src}.c" ]; then \
+			src="$${src}.c"; \
+		else \
+			echo -e "$(RED)Error: No matching source for $$obj$(RESET)"; \
+			exit 1; \
+		fi; \
+		echo -e "$(CYAN)Compiling $$src -> $$obj$(RESET)"; \
+		mkdir -p $$(dirname $$obj); \
+		time $(CXX_WIN) $(CXXFLAGS_WIN) -c $$src -o $$obj; \
+	done
 
 win_fast: $(OBJ_LIB_WIN)
 	$(CXX_WIN) $(CXXFLAGS_WIN) -c src/main.cpp -o obj/windows/main.o
 	$(CXX_WIN) $(OBJ_WIN) -o $(TARGET_WIN) $(CXXLIBS_WIN)
 
 $(TARGET_WIN): $(OBJ_COMP_WIN) #linking
-	$(info Linking program for windows)
+	@echo -e "$(PURPLE)Linking program for windows$(RESET)"
 	$(CXX_WIN) $(OBJ_WIN) -o $(TARGET_WIN) $(CXXLIBS_WIN)
 ifeq ($(DEBUG),0)
 	strip $(TARGET_WIN)
 endif
 
-#compiling
-$(OBJ_COMP_WIN):
-	$(info Compiling program for windows)
-	for obj in $(OBJ_COMP_WIN); do \
-		src=$$(echo $$obj | sed 's|obj/windows/|src/|' | sed 's|\.o$$||'); \
-		if [ -f "$${src}.cpp" ]; then \
-			src="$${src}.cpp"; \
-		elif [ -f "$${src}.c" ]; then \
-			src="$${src}.c"; \
-		else \
-			echo "Error: No matching source for $$obj"; \
-			exit 1; \
-		fi; \
-		echo "Compiling $$src -> $$obj"; \
-		mkdir -p $$(dirname $$obj); \
-		$(CXX_WIN) $(CXXFLAGS_WIN) -c $$src -o $$obj; \
-	done
-
 #compiling libs
 $(OBJ_LIB_WIN):
-	$(info Compiling libs for windows)
-	for obj in $(OBJ_LIB_WIN); do \
+	@echo -e "$(PURPLE)Compiling libs for windows$(RESET)"
+	@for obj in $(OBJ_LIB_WIN); do \
 		src=$$(echo $$obj | sed 's|obj/windows/|src/|' | sed 's|\.o$$||'); \
 		if [ -f "$${src}.cpp" ]; then \
 			src="$${src}.cpp"; \
 		elif [ -f "$${src}.c" ]; then \
 			src="$${src}.c"; \
 		else \
-			echo "Error: No matching source for $$obj"; \
+			echo -e "$(RED)Error: No matching source for $$obj$(RESET)"; \
 			exit 1; \
 		fi; \
-		echo "Compiling $$src -> $$obj"; \
+		echo -e "$(CYAN)Compiling $$src -> $$obj$(RESET)"; \
 		mkdir -p $$(dirname $$obj); \
-		$(CXX_WIN) $(CXXFLAGS_LIB_WIN) -c $$src -o $$obj; \
+		time $(CXX_WIN) $(CXXFLAGS_LIB_WIN) -c $$src -o $$obj; \
 	done
 
 
@@ -194,15 +196,15 @@ nuke:
 
 
 test: linux run
-fast: linux_refresh run
+fast: linux_fast run
 
 test_win: win run_win
 fast_win: win_fast run_win
 
 run:
-	build/main
+	$(TARGET)
 run_win:
-	wine build/main.exe
+	wine $(TARGET_WIN)
 
 
 

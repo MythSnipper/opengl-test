@@ -41,7 +41,7 @@ namespace nuck{
     
         WindowManager(int opengl_context_version_major, int opengl_context_version_minor, int window_width, int window_height, char* window_title);
         ~WindowManager();
-        static void window_framebuffer_size_callback(GLFWwindow* window, int window_width, int window_height);
+        static void window_framebuffer_size_callback(GLFWwindow*, int window_width, int window_height);
         int window_should_exit();
         void refresh();
         void close_window();
@@ -139,6 +139,19 @@ namespace nuck{
 
 
     };
+    class Texture2D{
+        public:
+        uint32_t id;
+
+        Texture2D(char* file_path, GLenum internal_format = 0);
+        void bind();
+        void bind_texture_unit(GLenum texture_unit);
+
+        private:
+        int texture_width;
+        int texture_height;
+        int color_channels_count;
+    };
     class GL{
         public:
         bool wireframe_mode = false;
@@ -153,7 +166,7 @@ namespace nuck{
         void info();
         private:
 
-        
+
     };
 
 
