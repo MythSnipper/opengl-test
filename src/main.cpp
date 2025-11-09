@@ -18,10 +18,10 @@ int main(int argc, char* argv[]){
 
     //data
     float vertices[] = {
-        -0.7f, 0.7f, 0.0f,    1.0f, 0.0f, 0.0f,    0.0f, 1.0f, //top left
-        0.7f, 0.7f, 0.0f,     0.0f, 1.0f, 0.0f,    1.0f, 1.0f, //top right
-        0.7f, -0.7f, 0.0f,   0.0f, 1.0f, 1.0f,    1.0f, 0.0f, //bottom right
-        -0.7f, -0.7f, 0.0f,    0.0f, 0.0f, 1.0f,    0.0f, 0.0f, //bottom left
+        -0.9f, 0.9f, 0.0f,    1.0f, 0.0f, 0.0f,    0.0f, 1.0f, //top left
+        0.9f, 0.9f, 0.0f,     0.0f, 1.0f, 0.0f,    1.0f, 1.0f, //top right
+        0.9f, -0.9f, 0.0f,    0.0f, 1.0f, 1.0f,    1.0f, 0.0f, //bottom right
+        -0.9f, -0.9f, 0.0f,   0.0f, 0.0f, 1.0f,    0.0f, 0.0f, //bottom left
     };
     uint32_t indices[] = {
         0, 1, 2,
@@ -62,17 +62,24 @@ int main(int argc, char* argv[]){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR); //linear bitmap, nearest filtering
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //linear filtering
 
-    nuck::Texture2D texture0("textures/flandre_scarlet.png", GL_RGBA);
+    //load textures
+    nuck::Texture2D texture0("textures/niko.png", GL_RGBA);
     texture0.bind();
 
-    nuck::Texture2D texture1("textures/niko.png", GL_RGBA);
+    nuck::Texture2D texture1("textures/flandre_scarlet.png", GL_RGBA);
     texture1.bind();
 
-    ShaderProgram.set_int("texture0", {0});
-    ShaderProgram.set_int("texture1", {1});
+
+
+
+
+
+
+    //transform matrix
+    glm::mat4 transform = glm::mat4(1.0f);
 
     float speed = 0.01f;
-    float spd = 1;
+    float angle = 0.0f;
     //Main loop
     while(!WindowManager.window_should_exit()){
         //input
@@ -90,26 +97,41 @@ int main(int argc, char* argv[]){
             vertices[1] -= speed;
         }
         if(InputManager.key_down(GLFW_KEY_E)){
-            spd += 0.02;
+            angle += 1;
         }
         if(InputManager.key_down(GLFW_KEY_Q)){
-            spd -= 0.02;
+            angle -= 1;
         }
         
         //restrain the values like putting the black man in handcuffs
         nuck::clamp(&vertices[0], -1.0f, 1.0f);
         nuck::clamp(&vertices[1], -0.99f, 0.99f);
-        nuck::clamp(&spd, 0.01f, 100000.0f);
+        if(angle > 360) angle -= 360.0f;
+        if(angle < -360) angle += 360.0f;
 
         VBO.fill(vertices, sizeof(vertices), GL_DYNAMIC_DRAW);
 
 
-        
+
+        transform = glm::mat4(1.0f);
+        transform = glm::rotate(transform, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+        //transform = glm::rotate(transform, (float)(3.0 * glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+        transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0f));
+
         //rendering
         //clear screen
         glClear(GL_COLOR_BUFFER_BIT);
 
         ShaderProgram.activate();
+
+        //set uniforms
+        ShaderProgram.set_int("texture0", {0});
+        ShaderProgram.set_int("texture1", {1});
+
+        uint32_t loc = glGetUniformLocation(ShaderProgram.id, "aTransform");
+        glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(transform));
+
+
         texture0.bind_texture_unit(GL_TEXTURE0);
         texture1.bind_texture_unit(GL_TEXTURE1);
         VAO.bind();
