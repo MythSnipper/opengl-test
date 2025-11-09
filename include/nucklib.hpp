@@ -43,10 +43,13 @@ namespace nuck{
     class WindowManager{
         public:
         GLFWwindow* window;
-    
-        WindowManager(int opengl_context_version_major, int opengl_context_version_minor, int window_width, int window_height, char* window_title);
+        uint32_t window_width;
+        uint32_t window_height;
+        float aspect_ratio;
+
+        WindowManager(uint8_t opengl_context_version_major, uint8_t opengl_context_version_minor, uint32_t window_width, uint32_t window_height, char* window_title);
         ~WindowManager();
-        static void window_framebuffer_size_callback(GLFWwindow*, int window_width, int window_height);
+        static void window_framebuffer_size_callback(GLFWwindow* window, int window_width, int window_height);
         int window_should_exit();
         void refresh();
         void close_window();
@@ -102,6 +105,8 @@ namespace nuck{
         void set_int(UniformID uid, std::initializer_list<int> values);
         void set_float(char* name, std::initializer_list<float> values);
         void set_float(UniformID uid, std::initializer_list<float> values);
+        void set_mat4(char* name, bool transpose, glm::mat4 matrix);
+        void set_mat4(UniformID uid, bool transpose, glm::mat4 matrix);
         void activate();
         private:
         
@@ -161,6 +166,8 @@ namespace nuck{
         public:
         bool wireframe_mode = false;
         Color background_color;
+        bool depth_test = false;
+        bool vsync = true;
 
         void set_wireframe_mode(bool enable);
         void set_background_color(uint8_t r, uint8_t g, uint8_t b);
@@ -168,6 +175,8 @@ namespace nuck{
         void set_background_color(float r, float g, float b);
         void set_background_color(float r, float g, float b, float a);
         void set_background_color(uint32_t color);
+        void set_depth_test(bool enable);
+        void set_vsync(bool enable);
         void info();
         private:
 
@@ -184,6 +193,8 @@ namespace nuck{
     char* read_file(const char* filename);
     template<typename T> T clamp(T num, T min, T max);
     template<typename T> void clamp(T* num, T min, T max);
+    float abs(float num);
+
 
 }
 

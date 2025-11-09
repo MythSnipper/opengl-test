@@ -2,7 +2,7 @@
 #include "nucklib.hpp"
 
 namespace nuck{
-    WindowManager::WindowManager(int opengl_context_version_major, int opengl_context_version_minor, int window_width, int window_height, char* window_title){
+    WindowManager::WindowManager(uint8_t opengl_context_version_major, uint8_t opengl_context_version_minor, uint32_t window_width, uint32_t window_height, char* window_title){
         glfwInit();
         killGLFW = true;
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, opengl_context_version_major);
@@ -18,6 +18,10 @@ namespace nuck{
             throw std::runtime_error("Failed to initialize GLAD");
         }
         glViewport(0, 0, window_width, window_height);
+        this->window_width = window_width;
+        this->window_height = window_height;
+        aspect_ratio = (float)window_width/(float)window_height;
+        glfwSetWindowUserPointer(window, this);
         glfwSetFramebufferSizeCallback(window, window_framebuffer_size_callback);
     }
     WindowManager::~WindowManager(){
@@ -26,9 +30,13 @@ namespace nuck{
             glfwTerminate();
         }
     }
-    void WindowManager::window_framebuffer_size_callback(GLFWwindow*, int window_width, int window_height){
-        printf("Framebuffer size changed to: %dx%d!\n", window_width, window_height);
-        glViewport(0, 0, window_width, window_height);
+    void WindowManager::window_framebuffer_size_callback(GLFWwindow* window, int new_width, int new_height){
+        WindowManager* vel = (WindowManager*)glfwGetWindowUserPointer(window);
+        printf("Framebuffer size changed to: %dx%d!\n", new_width, new_height);
+        glViewport(0, 0, new_width, new_height);
+        vel->window_width = new_width;
+        vel->window_height = new_height;
+        vel->aspect_ratio = (float)new_width/(float)new_height;
     }
     int WindowManager::window_should_exit(){
         return glfwWindowShouldClose(window);
@@ -273,6 +281,12 @@ namespace nuck{
                 throw std::runtime_error(" ^ ^");
         }
     }
+    void ShaderProgram::set_mat4(char* name, bool transpose, glm::mat4 matrix){
+        set_mat4(glGetUniformLocation(id, name), transpose, matrix);
+    }
+    void ShaderProgram::set_mat4(UniformID uid, bool transpose, glm::mat4 matrix){
+        glUniformMatrix4fv(uid, 1, (transpose) ? GL_TRUE : GL_FALSE, glm::value_ptr(matrix));
+    }
     void ShaderProgram::activate(){
         glUseProgram(id);
     }
@@ -393,11 +407,22 @@ namespace nuck{
         #else
             printf("linux\n");
         #endif
+        printf("Wireframe mode: %s\n", (wireframe_mode) ? "On" : "Off");
+        printf("background color: (%f, %f, %f, %f)\n", background_color.r, background_color.g, background_color.b, background_color.a);
+        printf("Depth testing: %s\n", (depth_test) ? "On" : "Off");
+
         int nrAttributes;
         glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
         printf("Number of vertex attributes available: %d\n", nrAttributes);
     }
-
+    void GL::set_depth_test(bool enable){
+        depth_test = enable;
+        glEnable(GL_DEPTH_TEST);
+    }
+    void GL::set_vsync(bool enable){
+        vsync = enable;
+        glfwSwapInterval(enable);
+    }
 
 
 
@@ -446,6 +471,10 @@ namespace nuck{
     }
     template void clamp<int>(int*, int, int);
     template void clamp<float>(float*, float, float);
+    
+    float abs(float num){
+        return (num > 0) ? num : -num;
+    }
 
 
 }
