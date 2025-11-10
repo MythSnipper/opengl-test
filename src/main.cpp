@@ -111,12 +111,47 @@ int main(int argc, char* argv[]){
     nuck::Texture2D texture0("textures/niko.png", GL_RGBA);
     texture0.bind();
 
-    nuck::Texture2D texture1("textures/grass.png", GL_RGBA);
+    nuck::Texture2D texture1("textures/fabric.png", GL_RGBA);
     texture1.bind();
+
+
+    //test
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(WindowManager.window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     double lastTime = glfwGetTime();
     double time = glfwGetTime();
     double dt, fps;
+
+    float posX = 0.0f;
+    float posY = 0.0f;
+    float posZ = 5.0f;
 
     float angleX = 0.0f;
     float angleY = 0.0f;
@@ -127,28 +162,47 @@ int main(int argc, char* argv[]){
     float angularVelZ = 0.0f;
 
     float accel = 0.3f;
-    float damping = 0.95f;
+    float pos_speed = 0.1f;
+    float damping = 0.98f;
     //Main loop
     while(!WindowManager.window_should_exit()){
-        
         //input
         InputManager.process_input();
         if(InputManager.key_down(GLFW_KEY_W)){
-            angularVelZ -= accel;
+            posZ -= pos_speed;
         }
         if(InputManager.key_down(GLFW_KEY_S)){
-            angularVelZ += accel;
+            posZ += pos_speed;
         }
         if(InputManager.key_down(GLFW_KEY_A)){
-            angularVelX -= accel;
+            posX += pos_speed;
         }
         if(InputManager.key_down(GLFW_KEY_D)){
+            posX -= pos_speed;
+        }
+        if(InputManager.key_down(GLFW_KEY_SPACE)){
+            posY -= pos_speed;
+        }
+        if(InputManager.key_down(GLFW_KEY_LEFT_SHIFT)){
+            posY += pos_speed;
+        }
+
+        if(InputManager.key_down(GLFW_KEY_UP)){
+            angularVelZ -= accel;
+        }
+        if(InputManager.key_down(GLFW_KEY_DOWN)){
+            angularVelZ += accel;
+        }
+        if(InputManager.key_down(GLFW_KEY_LEFT)){
+            angularVelX -= accel;
+        }
+        if(InputManager.key_down(GLFW_KEY_RIGHT)){
             angularVelX += accel;
         }
-        if(InputManager.key_down(GLFW_KEY_E)){
+        if(InputManager.key_down(GLFW_KEY_PAGE_DOWN)){
             angularVelY -= accel;
         }
-        if(InputManager.key_down(GLFW_KEY_Q)){
+        if(InputManager.key_down(GLFW_KEY_PAGE_UP)){
             angularVelY += accel;
         }
 
@@ -156,8 +210,8 @@ int main(int argc, char* argv[]){
         angularVelY *= damping;
         angularVelZ *= damping;
 
-        printf("angles: %f %f %f\n", angleX, angleY, angleZ);
-        printf("angular velocities: %f %f %f\n", angularVelX, angularVelY, angularVelZ);
+        //printf("angles: %f %f %f\n", angleX, angleY, angleZ);
+        //printf("angular velocities: %f %f %f\n", angularVelX, angularVelY, angularVelZ);
 
         angleX += angularVelX;
         angleY += angularVelY;
@@ -177,7 +231,7 @@ int main(int argc, char* argv[]){
         model = glm::rotate(model, glm::radians(angleX), glm::vec3(0.0f, 1.0f, 0.0f));
 
         glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        view = glm::translate(view, glm::vec3(posX, posY, -posZ));
 
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), WindowManager.aspect_ratio, 0.1f, 100.0f);
         

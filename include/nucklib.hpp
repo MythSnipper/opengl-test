@@ -37,6 +37,18 @@ namespace nuck{
         uint8_t b;
         uint8_t a;
     };
+    struct Complex32{
+        float real = 0.0;
+        float imaginary = 0.0;
+    };
+    struct Complex64{
+        double real = 0.0;
+        double imaginary = 0.0;
+    };
+    struct Complex128{
+        long double real = 0.0;
+        long double imaginary = 0.0;
+    };
     typedef int UniformID;
 
 
@@ -193,7 +205,12 @@ namespace nuck{
     char* read_file(const char* filename);
     template<typename T> T clamp(T num, T min, T max);
     template<typename T> void clamp(T* num, T min, T max);
-    float abs(float num);
+    template<typename T> T abs(T num);
+    template<typename T> T operator+(const T& num1, const T& num2);
+    template<typename T> T operator-(const T& num1, const T& num2);
+    template<typename T> T operator*(const T& num1, const T& num2);
+    template<typename T> T operator^(const T& num1, uint32_t power);
+
 
 
 }

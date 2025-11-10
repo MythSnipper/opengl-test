@@ -460,6 +460,8 @@ namespace nuck{
     }
     template int clamp<int>(int, int, int);
     template float clamp<float>(float, float, float);
+    template double clamp<double>(double, double, double);
+    template long double clamp<long double>(long double, long double, long double);
 
     template<typename T> void clamp(T* num, T min, T max){
         if(*num < min){
@@ -471,10 +473,54 @@ namespace nuck{
     }
     template void clamp<int>(int*, int, int);
     template void clamp<float>(float*, float, float);
+    template void clamp<double>(double*, double, double);
+    template void clamp<long double>(long double*, long double, long double);
     
-    float abs(float num){
+    template<typename T> T abs(T num){
         return (num > 0) ? num : -num;
     }
+    template int abs<int>(int);
+    template float abs<float>(float);
+    template double abs<double>(double);
+    template long double abs<long double>(long double);
+
+    template<typename T> T operator+(const T& num1, const T& num2){
+        return T(num1.real + num2.real, num1.imaginary + num2.imaginary);
+    }
+    template Complex32 operator+<Complex32>(const Complex32&, const Complex32&);
+    template Complex64 operator+<Complex64>(const Complex64&, const Complex64&);
+    template Complex128 operator+<Complex128>(const Complex128&, const Complex128&);
+
+    template<typename T> T operator-(const T& num1, const T& num2){
+        return T(num1.real - num2.real, num1.imaginary - num2.imaginary);
+    }
+    template Complex32 operator-<Complex32>(const Complex32&, const Complex32&);
+    template Complex64 operator-<Complex64>(const Complex64&, const Complex64&);
+    template Complex128 operator-<Complex128>(const Complex128&, const Complex128&);
+
+    template<typename T> T operator*(const T& num1, const T& num2){
+        return T((num1.real * num2.real) - (num1.imaginary * num2.imaginary), (num1.real * num2.imaginary) + (num2.real * num1.imaginary));
+    }
+    template Complex32 operator*<Complex32>(const Complex32&, const Complex32&);
+    template Complex64 operator*<Complex64>(const Complex64&, const Complex64&);
+    template Complex128 operator*<Complex128>(const Complex128&, const Complex128&);
+
+    template<typename T> T operator^(const T& num1, uint32_t power){
+        T ret(1, 0);
+        T base = num1;
+        while(power > 0){
+            if(power%2==1){
+                ret = ret * base;
+            }
+            base = base * base;
+            power /= 2;
+        }
+        return ret;
+    }
+    template Complex32 operator^<Complex32>(const Complex32&, uint32_t);
+    template Complex64 operator^<Complex64>(const Complex64&, uint32_t);
+    template Complex128 operator^<Complex128>(const Complex128&, uint32_t);
+
 
 
 }
