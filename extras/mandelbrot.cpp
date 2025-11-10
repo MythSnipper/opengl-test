@@ -11,26 +11,26 @@ float xmax = 1.4f;
 float ymin = -1.2f;
 float ymax = 1.2f;
 
-double scrollOffsetY = 0.0;
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
-    scrollOffsetY = yoffset;
+
+void scroll_zoom(GLFWwindow* window, double zoomAmount) {
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
 
     double mouseX, mouseY;
     glfwGetCursorPos(window, &mouseX, &mouseY);
 
-    int width, height;
-    glfwGetWindowSize(window, &width, &height);
+    // normalized mouse coordinates (0..1)
     double nx = mouseX / double(width);
     double ny = 1.0 - mouseY / double(height);
 
-    double zoomFactor = 1.0 + scrollOffsetY * 0.1; // adjust 0.1 for zoom speed
-    if (zoomFactor < 0.1) zoomFactor = 0.1;       // avoid negative or zero scale
+    double zoomFactor = 1.0 + zoomAmount * 0.1; // adjust speed
+    if (zoomFactor < 0.1) zoomFactor = 0.1;     // prevent negative/zero scale
 
-    // compute width and height of current view
+    // compute current view size
     double xRange = xmax - xmin;
     double yRange = ymax - ymin;
 
-    // compute the point under the mouse in complex plane
+    // point under mouse in complex plane
     double mouseRe = xmin + nx * xRange;
     double mouseIm = ymin + (1.0 - ny) * yRange;
 
@@ -39,7 +39,11 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
     xmax = mouseRe + (xmax - mouseRe) / zoomFactor;
     ymin = mouseIm + (ymin - mouseIm) / zoomFactor;
     ymax = mouseIm + (ymax - mouseIm) / zoomFactor;
+}
 
+// GLFW scroll callback just calls the function
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+    scroll_zoom(window, yoffset);
 }
 
 
@@ -120,7 +124,12 @@ int main(int argc, char* argv[]){
         //input
         
         InputManager.process_input();
-        
+        if(InputManager.key_down(GLFW_KEY_Z)){
+            scroll_zoom(WindowManager.window, 1.05);
+        }
+        if(InputManager.key_down(GLFW_KEY_X)){
+            scroll_zoom(WindowManager.window, -1.05);
+        }
 
 
 
