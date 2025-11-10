@@ -108,10 +108,10 @@ int main(int argc, char* argv[]){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //linear filtering
 
     //load textures
-    nuck::Texture2D texture0("textures/lilly.png", GL_RGBA);
+    nuck::Texture2D texture0("textures/niko.png", GL_RGBA);
     texture0.bind();
 
-    nuck::Texture2D texture1("textures/trans.png", GL_RGBA);
+    nuck::Texture2D texture1("textures/grass.png", GL_RGBA);
     texture1.bind();
 
     double lastTime = glfwGetTime();
@@ -134,10 +134,10 @@ int main(int argc, char* argv[]){
         //input
         InputManager.process_input();
         if(InputManager.key_down(GLFW_KEY_W)){
-            angularVelY += accel;
+            angularVelZ -= accel;
         }
         if(InputManager.key_down(GLFW_KEY_S)){
-            angularVelY -= accel;
+            angularVelZ += accel;
         }
         if(InputManager.key_down(GLFW_KEY_A)){
             angularVelX -= accel;
@@ -146,10 +146,10 @@ int main(int argc, char* argv[]){
             angularVelX += accel;
         }
         if(InputManager.key_down(GLFW_KEY_E)){
-            angularVelZ += accel;
+            angularVelY -= accel;
         }
         if(InputManager.key_down(GLFW_KEY_Q)){
-            angularVelZ -= accel;
+            angularVelY += accel;
         }
 
         angularVelX *= damping;
