@@ -7,7 +7,6 @@ CXXFLAGS = -std=c++23 \
 -Wno-old-style-cast \
 -Wno-sign-conversion \
 -Iinclude \
--O3 \
 -g
 CXXFLAGS_LIB := -std=c++23 \
 -Wall \
@@ -27,7 +26,6 @@ CXXFLAGS_WIN = -std=c++23 \
 -Wno-old-style-cast \
 -Wno-sign-conversion \
 -Iinclude \
--O0 \
 -g
 CXXFLAGS_LIB_WIN := -std=c++23 \
 -Wall \
@@ -204,6 +202,17 @@ run:
 run_win:
 	wine $(TARGET_WIN)
 
+mandelbrot: mandelbrot_build mandelbrot_run
+
+mandelbrot_build: $(OBJ_LIB)
+	time $(CXX) $(CXXFLAGS) -O3 -c extras/mandelbrot.cpp -o extras/mandelbrot.o;
+	time $(CXX) $(CXXFLAGS) -O3 -c src/nucklib.cpp -o extras/nucklib.o;
+	time $(CXX) $(OBJ_LIB) extras/mandelbrot.o extras/nucklib.o -o build/mandelbrot $(CXXLIBS);
+	rm extras/mandelbrot.o
+	rm extras/nucklib.o
+
+mandelbrot_run:
+	build/mandelbrot
 
 
 
