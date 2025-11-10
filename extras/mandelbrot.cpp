@@ -1,8 +1,52 @@
 #include <nucklib.hpp>
 
+float xmin_lim = -2.3f;
+float xmax_lim = 1.4f;
+float ymin_lim = -1.2f;
+float ymax_lim = 1.2f;
+
+
+float xmin = -2.3f;
+float xmax = 1.4f;
+float ymin = -1.2f;
+float ymax = 1.2f;
+
+double scrollOffsetY = 0.0;
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
+    scrollOffsetY = yoffset;
+
+    double mouseX, mouseY;
+    glfwGetCursorPos(window, &mouseX, &mouseY);
+
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+    double nx = mouseX / double(width);
+    double ny = 1.0 - mouseY / double(height);
+
+    double zoomFactor = 1.0 + scrollOffsetY * 0.1; // adjust 0.1 for zoom speed
+    if (zoomFactor < 0.1) zoomFactor = 0.1;       // avoid negative or zero scale
+
+    // compute width and height of current view
+    double xRange = xmax - xmin;
+    double yRange = ymax - ymin;
+
+    // compute the point under the mouse in complex plane
+    double mouseRe = xmin + nx * xRange;
+    double mouseIm = ymin + (1.0 - ny) * yRange;
+
+    // scale view around mouse
+    xmin = mouseRe + (xmin - mouseRe) / zoomFactor;
+    xmax = mouseRe + (xmax - mouseRe) / zoomFactor;
+    ymin = mouseIm + (ymin - mouseIm) / zoomFactor;
+    ymax = mouseIm + (ymax - mouseIm) / zoomFactor;
+
+}
+
+
 int main(int argc, char* argv[]){
 
     nuck::WindowManager WindowManager(3, 3, 1280, 720, "nuckGL");
+    glfwSetScrollCallback(WindowManager.window, scroll_callback);
 
     nuck::InputManager InputManager(WindowManager.window);
 
@@ -65,37 +109,33 @@ int main(int argc, char* argv[]){
     int iterations = 5000;
     int limit = 4;
     
-    float xmin = -2.5f;
-    float xmax = 1.0f;
-    float ymin = -1.0f;
-    float ymax = 1.0f;
-
-    
     double lastTime = glfwGetTime();
     double time = glfwGetTime();
     double dt, fps;
 
-    float posX = 0.0f;
-    float posY = 0.0f;
-    float posZ = 2.0f;
+    uint32_t ctr = 0;
 
-    float angleX = 0.0f;
-    float angleY = 0.0f;
-    float angleZ = 0.0f;
-
-    float angularVelX = 0.0f;
-    float angularVelY = 0.0f;
-    float angularVelZ = 0.0f;
-
-    float accel = 0.3f;
-    float pos_speed = 0.1f;
-    float damping = 0.98f;
     //Main loop
     while(!WindowManager.window_should_exit()){
         //input
         
         InputManager.process_input();
         
+
+
+
+
+
+
+        //clamps
+        nuck::clamp(&xmin, xmin_lim, xmax_lim);
+        nuck::clamp(&xmax, xmin_lim, xmax_lim);
+        nuck::clamp(&ymin, ymin_lim, ymax_lim);
+        nuck::clamp(&ymax, ymin_lim, ymax_lim);
+
+
+
+
 
         //rendering
         //clear screen
@@ -120,8 +160,11 @@ int main(int argc, char* argv[]){
         dt = time - lastTime;
         fps = 1 / dt;
         lastTime = time;
-
-        printf("dt: %lf fps: %lf\n", dt, fps);
+        ctr++;
+        if(ctr > 30){
+            printf("FPS: %lf\n", fps);
+            ctr = 0;
+        }
     }
 
     return 0;
