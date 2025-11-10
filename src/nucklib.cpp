@@ -239,19 +239,19 @@ namespace nuck{
         set_int(glGetUniformLocation(id, name), values);
     }
     void ShaderProgram::set_int(UniformID uid, std::initializer_list<int> values){
-        const int* veeronica = values.begin();
+        const int* vel = values.begin();
         switch(values.size()){
             case 1:
-                glUniform1i(uid, veeronica[0]);
+                glUniform1i(uid, vel[0]);
             break;
             case 2:
-                glUniform2i(uid, veeronica[0], veeronica[1]);
+                glUniform2i(uid, vel[0], vel[1]);
             break;
             case 3:
-                glUniform3i(uid, veeronica[0], veeronica[1], veeronica[2]);
+                glUniform3i(uid, vel[0], vel[1], vel[2]);
             break;
             case 4:
-                glUniform4i(uid, veeronica[0], veeronica[1], veeronica[2], veeronica[3]);
+                glUniform4i(uid, vel[0], vel[1], vel[2], vel[3]);
             break;
             default:
                 printf("Invalid number of values to set uniform\nExpected 1-4, got %d\n", values.size());
@@ -262,19 +262,19 @@ namespace nuck{
         set_float(glGetUniformLocation(id, name), values);
     }
     void ShaderProgram::set_float(UniformID uid, std::initializer_list<float> values){
-        const float* veeronica = values.begin();
+        const float* vel = values.begin();
         switch(values.size()){
             case 1:
-                glUniform1f(uid, veeronica[0]);
+                glUniform1f(uid, vel[0]);
             break;
             case 2:
-                glUniform2f(uid, veeronica[0], veeronica[1]);
+                glUniform2f(uid, vel[0], vel[1]);
             break;
             case 3:
-                glUniform3f(uid, veeronica[0], veeronica[1], veeronica[2]);
+                glUniform3f(uid, vel[0], vel[1], vel[2]);
             break;
             case 4:
-                glUniform4f(uid, veeronica[0], veeronica[1], veeronica[2], veeronica[3]);
+                glUniform4f(uid, vel[0], vel[1], vel[2], vel[3]);
             break;
             default:
                 printf("Invalid number of values to set uniform\nExpected 1-4, got %d\n", values.size());
@@ -311,6 +311,8 @@ namespace nuck{
         glBufferData(GL_ARRAY_BUFFER, vertices_size, vertices, usage);
     }
 
+
+
     VAO::VAO(){
         glGenVertexArrays(1, &id);
     }
@@ -320,6 +322,8 @@ namespace nuck{
     void VAO::unbind(){
         glBindVertexArray(0);
     }
+
+
 
     EBO::EBO(){
         glGenBuffers(1, &id);
@@ -342,8 +346,16 @@ namespace nuck{
 
 
     Texture2D::Texture2D(char* file_path, GLenum internal_format){
+        glGenTextures(1, &id);
+        fill(file_path, internal_format);
+    }
+    Texture2D::Texture2D(uint8_t* data, uint32_t width, uint32_t height, GLenum image_format, GLenum internal_format){
+        glGenTextures(1, &id);
+        fill(data, width, height, image_format, internal_format);
+    }
+    void Texture2D::fill(char* file_path, GLenum internal_format){
         //load texture
-        uint8_t *data = stbi_load(file_path, &texture_width, &texture_height, &color_channels_count, 0);
+        uint8_t* data = stbi_load(file_path, &texture_width, &texture_height, &color_channels_count, 0);
         if(!data){
             printf("Failed to load texture image %s\n", file_path);
             throw std::runtime_error(" ^ ^");
@@ -352,17 +364,16 @@ namespace nuck{
             printf("Invalid color channels count for texture image: %d\n", color_channels_count);
             throw std::runtime_error(" ^ ^");
         }
-        if(internal_format == 0){
-            internal_format = (color_channels_count == 4) ? GL_RGBA : GL_RGB;
-        }
-
-        glGenTextures(1, &id);
-        bind();
-
-        glTexImage2D(GL_TEXTURE_2D, 0, internal_format, texture_width, texture_height, 0, (color_channels_count == 4) ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
+        fill(data, texture_width, texture_height, (color_channels_count == 4) ? GL_RGBA : GL_RGB, internal_format);
         stbi_image_free(data);
+    }
+    void Texture2D::fill(uint8_t* data, uint32_t width, uint32_t height, GLenum image_format, GLenum internal_format){
+        if(internal_format == 0){
+            internal_format = image_format;
+        }
+        bind();
+        glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, image_format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
     }
     void Texture2D::bind(){
         glBindTexture(GL_TEXTURE_2D, id);
@@ -484,43 +495,33 @@ namespace nuck{
     template double abs<double>(double);
     template long double abs<long double>(long double);
 
-    template<typename T> T operator+(const T& num1, const T& num2){
-        return T(num1.real + num2.real, num1.imaginary + num2.imaginary);
+    Complex operator+(const Complex& num1, const Complex& num2){
+        return Complex(num1.real + num2.real, num1.imaginary + num2.imaginary);
     }
-    template Complex32 operator+<Complex32>(const Complex32&, const Complex32&);
-    template Complex64 operator+<Complex64>(const Complex64&, const Complex64&);
-    template Complex128 operator+<Complex128>(const Complex128&, const Complex128&);
-
-    template<typename T> T operator-(const T& num1, const T& num2){
-        return T(num1.real - num2.real, num1.imaginary - num2.imaginary);
+    Complex operator-(const Complex& num1, const Complex& num2){
+        return Complex(num1.real - num2.real, num1.imaginary - num2.imaginary);
     }
-    template Complex32 operator-<Complex32>(const Complex32&, const Complex32&);
-    template Complex64 operator-<Complex64>(const Complex64&, const Complex64&);
-    template Complex128 operator-<Complex128>(const Complex128&, const Complex128&);
-
-    template<typename T> T operator*(const T& num1, const T& num2){
-        return T((num1.real * num2.real) - (num1.imaginary * num2.imaginary), (num1.real * num2.imaginary) + (num2.real * num1.imaginary));
+    Complex operator*(const Complex& num1, const Complex& num2){
+        return Complex((num1.real * num2.real) - (num1.imaginary * num2.imaginary), (num1.real * num2.imaginary) + (num2.real * num1.imaginary));
     }
-    template Complex32 operator*<Complex32>(const Complex32&, const Complex32&);
-    template Complex64 operator*<Complex64>(const Complex64&, const Complex64&);
-    template Complex128 operator*<Complex128>(const Complex128&, const Complex128&);
-
-    template<typename T> T operator^(const T& num1, uint32_t power){
-        T ret(1, 0);
-        T base = num1;
-        while(power > 0){
-            if(power%2==1){
-                ret = ret * base;
-            }
-            base = base * base;
-            power /= 2;
+    uint32_t mandelbrot(const Complex& num, uint32_t iterations, uint32_t limit){
+        double zr = 0.0f, zi = 0.0f;
+        double zr2 = 0.0f, zi2 = 0.0f;
+    
+        for(uint32_t i = 0; i < iterations; ++i){
+            double temp = zr2 - zi2 + (double)num.real;
+            zi = 2.0f * zr * zi + (double)num.imaginary;
+            zr = temp;
+    
+            zr2 = zr * zr;
+            zi2 = zi * zi;
+    
+            if(zr2 + zi2 > limit)
+                return i;
         }
-        return ret;
+        return iterations;
     }
-    template Complex32 operator^<Complex32>(const Complex32&, uint32_t);
-    template Complex64 operator^<Complex64>(const Complex64&, uint32_t);
-    template Complex128 operator^<Complex128>(const Complex128&, uint32_t);
-
+    
 
 
 }

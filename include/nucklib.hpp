@@ -37,17 +37,9 @@ namespace nuck{
         uint8_t b;
         uint8_t a;
     };
-    struct Complex32{
-        float real = 0.0;
-        float imaginary = 0.0;
-    };
-    struct Complex64{
+    struct Complex{
         double real = 0.0;
         double imaginary = 0.0;
-    };
-    struct Complex128{
-        long double real = 0.0;
-        long double imaginary = 0.0;
     };
     typedef int UniformID;
 
@@ -165,7 +157,10 @@ namespace nuck{
         public:
         uint32_t id;
 
-        Texture2D(char* file_path, GLenum internal_format = 0);
+        Texture2D(char* file_path, GLenum internal_format);
+        Texture2D(uint8_t* data, uint32_t width, uint32_t height, GLenum image_format, GLenum internal_format);
+        void fill(char* file_path, GLenum internal_format);
+        void fill(uint8_t* data, uint32_t width, uint32_t height, GLenum image_format, GLenum internal_format);
         void bind();
         void bind_texture_unit(GLenum texture_unit);
 
@@ -206,13 +201,16 @@ namespace nuck{
     template<typename T> T clamp(T num, T min, T max);
     template<typename T> void clamp(T* num, T min, T max);
     template<typename T> T abs(T num);
-    template<typename T> T operator+(const T& num1, const T& num2);
-    template<typename T> T operator-(const T& num1, const T& num2);
-    template<typename T> T operator*(const T& num1, const T& num2);
-    template<typename T> T operator^(const T& num1, uint32_t power);
+    Complex operator+(const Complex& num1, const Complex& num2);
+    Complex operator-(const Complex& num1, const Complex& num2);
+    Complex operator*(const Complex& num1, const Complex& num2);
+    uint32_t mandelbrot(const Complex& num, uint32_t iterations, uint32_t limit);
 
 
 
+
+
+    
 }
 
 

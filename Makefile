@@ -7,7 +7,7 @@ CXXFLAGS = -std=c++23 \
 -Wno-old-style-cast \
 -Wno-sign-conversion \
 -Iinclude \
--O0 \
+-O3 \
 -g
 CXXFLAGS_LIB := -std=c++23 \
 -Wall \

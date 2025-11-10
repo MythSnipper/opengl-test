@@ -73,6 +73,21 @@ int main(int argc, char* argv[]){
         
     };
 
+
+
+    float quadVertices[] = {
+        // positions   // texcoords
+        -1.0f,  1.0f,  0.0f, 1.0f, // top-left
+        -1.0f, -1.0f,  0.0f, 0.0f, // bottom-left
+         1.0f, -1.0f,  1.0f, 0.0f, // bottom-right
+         1.0f,  1.0f,  1.0f, 1.0f  // top-right
+    };
+    
+    uint32_t quadIndices[] = {
+        0, 1, 2,
+        0, 2, 3
+    };
+
     nuck::VAO VAO;
     VAO.bind();
 
@@ -125,25 +140,15 @@ int main(int argc, char* argv[]){
 
 
 
+    uint32_t iterations = 100;
+    uint32_t limit = 4;
+    
+    double xmin = -2.5;
+    double xmax = 1.0;
+    double ymin = -1.0;
+    double ymax = 1.0;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    uint8_t* image = (uint8_t*) malloc((WindowManager.window_width * WindowManager.window_height * 3 * 8)); //rgb image
 
     double lastTime = glfwGetTime();
     double time = glfwGetTime();
@@ -151,7 +156,7 @@ int main(int argc, char* argv[]){
 
     float posX = 0.0f;
     float posY = 0.0f;
-    float posZ = 5.0f;
+    float posZ = 2.0f;
 
     float angleX = 0.0f;
     float angleY = 0.0f;
@@ -167,6 +172,7 @@ int main(int argc, char* argv[]){
     //Main loop
     while(!WindowManager.window_should_exit()){
         //input
+        
         InputManager.process_input();
         if(InputManager.key_down(GLFW_KEY_W)){
             posZ -= pos_speed;
@@ -222,6 +228,27 @@ int main(int argc, char* argv[]){
         angleY = fmod(angleY, 360.0f);
         angleZ = fmod(angleZ, 360.0f);
 
+        //mandelbrot calculations
+
+        double dx = (xmax - xmin) / WindowManager.window_width;
+        double dy = (ymax - ymin) / WindowManager.window_height;
+
+        for(uint32_t py = 0;py < WindowManager.window_height;py++){
+            for(uint32_t px = 0;px < WindowManager.window_width;px++){
+                double real = xmin + px * dx;
+                double imaginary = ymin + py * dy;
+                nuck::Complex vel{real, imaginary};
+                uint32_t iters = nuck::mandelbrot(vel, iterations, limit);
+                
+                uint8_t color = (uint8_t)(255.0 * iters / iterations);
+                image[(py * WindowManager.window_width + px) * 3] = color;
+                image[(py * WindowManager.window_width + px) * 3 + 1] = color;
+                image[(py * WindowManager.window_width + px) * 3 + 2] = color;
+
+            }
+        }
+        texture0.fill(image, WindowManager.window_width, WindowManager.window_height, GL_RGB, GL_RGB);
+
 
         //Vclip = Mprojection * Mview * Mmodel * Vlocal
         //fov, aspect ratio, near field, far field
@@ -234,7 +261,6 @@ int main(int argc, char* argv[]){
         view = glm::translate(view, glm::vec3(posX, posY, -posZ));
 
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), WindowManager.aspect_ratio, 0.1f, 100.0f);
-        
 
         //rendering
         //clear screen
@@ -256,6 +282,7 @@ int main(int argc, char* argv[]){
         EBO.bind();
         glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]), GL_UNSIGNED_INT, 0);
         
+
         WindowManager.refresh();
         time = glfwGetTime();
         dt = time - lastTime;
