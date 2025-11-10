@@ -141,62 +141,67 @@ int main(int argc, char* argv[]){
     float angularVelY = 0.0f;
     float angularVelZ = 0.0f;
 
-    float accel = 0.3f;
-    float pos_speed = 0.1f;
-    float damping = 0.98f;
+    float accel = 600.0f;
+    float pos_speed = 2.0f;
+    float damping = 0.95f;
     //Main loop
     while(!WindowManager.window_should_exit()){
+        time = glfwGetTime();
+        dt = time - lastTime;
+        fps = 1 / dt;
+        lastTime = time;
+        printf("dt: %lf FPS: %lf\n", dt, fps);
+
         //input
-        
         InputManager.process_input();
         if(InputManager.key_down(GLFW_KEY_W)){
-            posZ -= pos_speed;
+            posZ -= pos_speed * dt;
         }
         if(InputManager.key_down(GLFW_KEY_S)){
-            posZ += pos_speed;
+            posZ += pos_speed * dt;
         }
         if(InputManager.key_down(GLFW_KEY_A)){
-            posX += pos_speed;
+            posX += pos_speed * dt;
         }
         if(InputManager.key_down(GLFW_KEY_D)){
-            posX -= pos_speed;
+            posX -= pos_speed * dt;
         }
         if(InputManager.key_down(GLFW_KEY_SPACE)){
-            posY -= pos_speed;
+            posY -= pos_speed * dt;
         }
         if(InputManager.key_down(GLFW_KEY_LEFT_SHIFT)){
-            posY += pos_speed;
+            posY += pos_speed * dt;
         }
 
         if(InputManager.key_down(GLFW_KEY_UP)){
-            angularVelZ -= accel;
+            angularVelZ -= accel * dt;
         }
         if(InputManager.key_down(GLFW_KEY_DOWN)){
-            angularVelZ += accel;
+            angularVelZ += accel * dt;
         }
         if(InputManager.key_down(GLFW_KEY_LEFT)){
-            angularVelX -= accel;
+            angularVelX -= accel * dt;
         }
         if(InputManager.key_down(GLFW_KEY_RIGHT)){
-            angularVelX += accel;
+            angularVelX += accel * dt;
         }
         if(InputManager.key_down(GLFW_KEY_PAGE_DOWN)){
-            angularVelY -= accel;
+            angularVelY -= accel * dt;
         }
         if(InputManager.key_down(GLFW_KEY_PAGE_UP)){
-            angularVelY += accel;
+            angularVelY += accel * dt;
         }
 
-        angularVelX *= damping;
-        angularVelY *= damping;
-        angularVelZ *= damping;
+        angularVelX -= damping * angularVelX * dt;
+        angularVelY -= damping * angularVelY * dt;
+        angularVelZ -= damping * angularVelZ * dt;
 
         //printf("angles: %f %f %f\n", angleX, angleY, angleZ);
         //printf("angular velocities: %f %f %f\n", angularVelX, angularVelY, angularVelZ);
 
-        angleX += angularVelX;
-        angleY += angularVelY;
-        angleZ += angularVelZ;
+        angleX += angularVelX * dt;
+        angleY += angularVelY * dt;
+        angleZ += angularVelZ * dt;
         
         //restrain the values like putting the black man in handcuffs
         angleX = fmod(angleX, 360.0f);
@@ -236,12 +241,6 @@ int main(int argc, char* argv[]){
         glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]), GL_UNSIGNED_INT, 0);
         
         WindowManager.refresh();
-        time = glfwGetTime();
-        dt = time - lastTime;
-        fps = 1 / dt;
-        lastTime = time;
-
-        printf("dt: %lf fps: %lf\n", dt, fps);
     }
 
     return 0;
