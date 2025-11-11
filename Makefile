@@ -214,6 +214,16 @@ mandelbrot_build: $(OBJ_LIB)
 mandelbrot_run:
 	build/mandelbrot
 
+mandelbrot_win: mandelbrot_build_win mandelbrot_run_win
 
+mandelbrot_build_win: $(OBJ_LIB_WIN)
+	time $(CXX_WIN) $(CXXFLAGS_WIN) -O0 -c extras/mandelbrot.cpp -o extras/mandelbrot.o;
+	time $(CXX_WIN) $(CXXFLAGS_WIN) -O0 -c src/nucklib.cpp -o extras/nucklib.o;
+	time $(CXX_WIN) $(OBJ_LIB_WIN) extras/mandelbrot.o extras/nucklib.o -o build/mandelbrot.exe $(CXXLIBS_WIN);
+	rm extras/mandelbrot.o
+	rm extras/nucklib.o
+
+mandelbrot_run_win:
+	wine build/mandelbrot.exe
 
 

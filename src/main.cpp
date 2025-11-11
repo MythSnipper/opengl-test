@@ -125,9 +125,23 @@ int main(int argc, char* argv[]){
     ImGui_ImplOpenGL3_Init("#version 330");
 
 
+
+
+
+
+
+
+
+
+
+
+
+
     double lastTime = glfwGetTime();
     double time = glfwGetTime();
     double dt, fps;
+
+    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 
     float posX = 0.0f;
     float posY = 0.0f;

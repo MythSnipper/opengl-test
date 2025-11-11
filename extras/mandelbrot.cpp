@@ -1,17 +1,17 @@
 #include <nucklib.hpp>
 
-float xmin_lim = -2.3f;
-float xmax_lim = 1.4f;
-float ymin_lim = -1.2f;
-float ymax_lim = 1.2f;
+float xmin_lim = -3.6f;
+float xmax_lim = 3.6f;
+float ymin_lim = -2.4f;
+float ymax_lim = 2.4f;
 
 
-float xmin = -2.3f;
-float xmax = 1.4f;
-float ymin = -1.2f;
-float ymax = 1.2f;
+float xmin = xmin_lim;
+float xmax = xmax_lim;
+float ymin = ymin_lim;
+float ymax = ymax_lim;
 
-int iterations = 2000;
+int iterations = 1000;
 int limit = 4;
 bool vsync = true;
 char* fragShader = "shaders/mandelbrot.frag";
