@@ -11,6 +11,11 @@ float xmax = 1.4f;
 float ymin = -1.2f;
 float ymax = 1.2f;
 
+int iterations = 2000;
+int limit = 4;
+bool vsync = true;
+char* fragShader = "shaders/mandelbrot.frag";
+
 
 void scroll_zoom(GLFWwindow* window, double zoomAmount) {
     int width, height;
@@ -59,11 +64,11 @@ int main(int argc, char* argv[]){
     GL.set_wireframe_mode(false);
     GL.set_background_color(0x104C7E);
     GL.set_depth_test(true);
-    GL.set_vsync(true);
+    GL.set_vsync(vsync);
 
     stbi_set_flip_vertically_on_load(true);
 
-    nuck::ShaderProgram ShaderProgram("shaders/mandelbrot.vert", "shaders/mandelbrot.frag");
+    nuck::ShaderProgram ShaderProgram("shaders/mandelbrot.vert", fragShader);
     ShaderProgram.activate();
 
     float quadVertices[] = {
@@ -109,9 +114,6 @@ int main(int argc, char* argv[]){
     //texture filtering method
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR); //linear bitmap, nearest filtering
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //linear filtering
-
-    int iterations = 1000;
-    int limit = 4;
     
     double lastTime = glfwGetTime();
     double time = glfwGetTime();
