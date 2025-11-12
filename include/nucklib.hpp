@@ -1,7 +1,6 @@
 #ifndef NUCKLIB_HPP
 #define NUCKLIB_HPP
 
-
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
@@ -21,7 +20,6 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
 
 
 namespace nuck{
@@ -189,6 +187,13 @@ namespace nuck{
 
 
     };
+
+
+
+
+
+    //Engine
+    
 
 
     //GL related

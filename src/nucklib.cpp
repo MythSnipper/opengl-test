@@ -436,7 +436,37 @@ namespace nuck{
     }
 
 
+    //Engine
+    class GameObject{
+        public:
+        std::string name = NULL;
+        GameObject* parent = NULL;
+        std::vector<GameObject*> children;
 
+
+
+        private:
+
+
+
+
+    };
+    class Mesh{
+        public:
+        VAO VAO;
+        VBO VBO;
+        EBO EBO;
+
+        Mesh(){
+            
+        }
+
+
+        private:
+
+
+
+    };
 
 
 
