@@ -42,7 +42,6 @@ namespace nuck{
         return glfwWindowShouldClose(window);
     }
     void WindowManager::refresh(){
-        glfwPollEvents();
         glfwSwapBuffers(window);
     }
     void WindowManager::close_window(){
@@ -55,6 +54,7 @@ namespace nuck{
         this->window = window;
     }
     void InputManager::process_input(){
+        glfwPollEvents();
         if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
             glfwSetWindowShouldClose(window, true);
         }

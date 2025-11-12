@@ -137,37 +137,15 @@ int main(int argc, char* argv[]){
     ImGui_ImplOpenGL3_Init("#version 330");
 
 
-
-
+    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+    glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
     double lastTime = glfwGetTime();
     double time = glfwGetTime();
     double dt, fps;
 
-    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
-    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-    glm::vec3 cameraUp = glm::normalize(glm::cross(cameraDirection, cameraRight));
-    
-
-    
-    float posX = 0.0f;
-    float posY = 0.0f;
-    float posZ = 2.0f;
-
-    float angleX = 0.0f;
-    float angleY = 0.0f;
-    float angleZ = 0.0f;
-
-    float angularVelX = 0.0f;
-    float angularVelY = 0.0f;
-    float angularVelZ = 0.0f;
-
-    float accel = 600.0f;
-    float pos_speed = 2.0f;
-    float damping = 0.95f;
+    float camera_speed = 0.2f;
     //Main loop
     while(!WindowManager.window_should_exit()){
         time = glfwGetTime();
@@ -179,66 +157,44 @@ int main(int argc, char* argv[]){
         //input
         InputManager.process_input();
         if(InputManager.key_down(GLFW_KEY_W)){
-            posZ -= pos_speed * dt;
+            cameraPos += (camera_speed * dt) * cameraFront;
         }
         if(InputManager.key_down(GLFW_KEY_S)){
-            posZ += pos_speed * dt;
+            cameraPos -= (camera_speed * dt) * cameraFront;
         }
         if(InputManager.key_down(GLFW_KEY_A)){
-            posX += pos_speed * dt;
+            cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * (camera_speed * dt);
         }
         if(InputManager.key_down(GLFW_KEY_D)){
-            posX -= pos_speed * dt;
+            cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * (camera_speed * dt);
         }
+        /*
         if(InputManager.key_down(GLFW_KEY_SPACE)){
-            posY -= pos_speed * dt;
+            cameraPos += cameraUp * camera_speed;
         }
         if(InputManager.key_down(GLFW_KEY_LEFT_SHIFT)){
-            posY += pos_speed * dt;
+            cameraPos -= cameraUp * camera_speed;
         }
 
         if(InputManager.key_down(GLFW_KEY_UP)){
-            angularVelZ -= accel * dt;
+            cameraFront = glm::rotate(cameraFront, glm::radians(camera_speed * dt), cameraUp);
         }
         if(InputManager.key_down(GLFW_KEY_DOWN)){
-            angularVelZ += accel * dt;
+            cameraFront = glm::rotate(cameraFront, glm::radians(-camera_speed * dt), cameraUp);
         }
         if(InputManager.key_down(GLFW_KEY_LEFT)){
-            angularVelX -= accel * dt;
+            cameraFront = glm::rotate(cameraFront, glm::radians(camera_speed * dt), glm::cross(cameraFront, cameraUp));
         }
         if(InputManager.key_down(GLFW_KEY_RIGHT)){
-            angularVelX += accel * dt;
+            cameraFront = glm::rotate(cameraFront, glm::radians(-camera_speed * dt), glm::cross(cameraFront, cameraUp));
         }
         if(InputManager.key_down(GLFW_KEY_PAGE_DOWN)){
-            angularVelY -= accel * dt;
+            cameraFront = glm::rotate(cameraFront, glm::radians(camera_speed * dt), glm::cross(cameraFront, cameraUp));
         }
         if(InputManager.key_down(GLFW_KEY_PAGE_UP)){
-            angularVelY += accel * dt;
+            cameraFront = glm::rotate(cameraFront, glm::radians(-camera_speed * dt), glm::cross(cameraFront, cameraUp));
         }
-
-        angularVelX -= damping * angularVelX * dt;
-        angularVelY -= damping * angularVelY * dt;
-        angularVelZ -= damping * angularVelZ * dt;
-
-        //printf("angles: %f %f %f\n", angleX, angleY, angleZ);
-        //printf("angular velocities: %f %f %f\n", angularVelX, angularVelY, angularVelZ);
-
-        angleX += angularVelX * dt;
-        angleY += angularVelY * dt;
-        angleZ += angularVelZ * dt;
-        
-        //restrain the values like putting the black man in handcuffs
-        angleX = fmod(angleX, 360.0f);
-        angleY = fmod(angleY, 360.0f);
-        angleZ = fmod(angleZ, 360.0f);
-
-
-
-
-
-
-
-
+        */
 
 
         //Matrices
@@ -246,15 +202,7 @@ int main(int argc, char* argv[]){
         //fov, aspect ratio, near field, far field
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), WindowManager.aspect_ratio, 0.1f, 100.0f);
 
-
-        const float radius = 10.0f;
-        float camX = sin(glfwGetTime()) * radius;
-        float camZ = cos(glfwGetTime()) * radius;
-
-        glm::mat4 view;
-        view = glm::lookAt(cameraPos,
-        glm::vec3(0.0f, 0.0f, -1.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
         //rendering
         //clear screen
@@ -267,7 +215,6 @@ int main(int argc, char* argv[]){
         EBO.bind();
 
         //set uniforms
-        
         ShaderProgram.set_mat4("aProjection", false, projection);
         ShaderProgram.set_mat4("aView", false, view);
         //ShaderProgram.set_mat4("aModel", false, model);
@@ -277,9 +224,7 @@ int main(int argc, char* argv[]){
         texture0.bind_texture_unit(GL_TEXTURE0);
         texture1.bind_texture_unit(GL_TEXTURE1);
 
-
-
-        for(uint32_t i = 0; i < 10; i++){
+        for(uint32_t i=0;i<10;i++){
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
             float angle = 20.0f * i;
