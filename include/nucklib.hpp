@@ -39,6 +39,11 @@ namespace nuck{
         double real = 0.0;
         double imaginary = 0.0;
     };
+    struct Vertex{
+        glm::vec3 position;
+        glm::vec3 color;
+        glm::vec2 texCoords;
+    };
     typedef int UniformID;
 
 
@@ -194,6 +199,39 @@ namespace nuck{
 
     //Engine
     
+    class Component{
+        public:
+        GameObject* parent = nullptr;
+
+        virtual void Init(){
+
+        }
+        virtual void Update(){
+
+        }
+        virtual void Draw(){
+
+        }
+        private:
+
+    };
+    class Mesh{
+        public:
+        VAO vao;
+        VBO vbo;
+        EBO ebo;
+
+        std::vector<Vertex> vertices;
+        std::vector<uint32_t> indices;
+        
+        Mesh(const std::vector<Vertex>& verts, const std::vector<uint32_t>& inds);
+        void draw();
+
+        private:
+
+
+
+    };
 
 
     //GL related

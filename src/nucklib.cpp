@@ -439,11 +439,11 @@ namespace nuck{
     //Engine
     class GameObject{
         public:
-        std::string name = NULL;
-        GameObject* parent = NULL;
+        std::string name = nullptr;
+        GameObject* parent = nullptr;
         std::vector<GameObject*> children;
 
-        std::vector<void*> Components;
+        std::vector<Component*> Components;
 
         private:
 
@@ -451,22 +451,54 @@ namespace nuck{
 
 
     };
-    class Mesh{
+    class Transform: public Component{
         public:
-        VAO VAO;
-        VBO VBO;
-        EBO EBO;
-
-        Mesh(){
-            
-        }
-
-
-        private:
-
-
-
+        glm::vec3 position = glm::vec3(0.0f);
+        glm::vec3 rotation = glm::vec3(0.0f);
+        glm::vec3 scale = glm::vec3(1.0f);
     };
+    Mesh::Mesh(const std::vector<Vertex>& verts, const std::vector<uint32_t>& inds)
+    : vertices(verts), indices(inds),
+        vbo(vertices.data(), vertices.size() * sizeof(Vertex), GL_STATIC_DRAW),
+        ebo(indices.data(), indices.size() * sizeof(uint32_t), GL_STATIC_DRAW)
+    {
+        vao.bind();
+        vbo.bind();
+        ebo.bind();
+
+        // Vertex attributes
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+        glEnableVertexAttribArray(1);
+
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+        glEnableVertexAttribArray(2);
+
+        vao.unbind();
+    }
+    void Mesh::draw(){
+        vao.bind();
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+        vao.unbind();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

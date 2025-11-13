@@ -14,7 +14,7 @@ float ymax = ymax_lim;
 int iterations = 1000;
 int limit = 4;
 bool vsync = true;
-char* fragShader = "shaders/mandelbrot.frag";
+char* fragShader = "shaders/mandelbrot-old.frag";
 
 
 void scroll_zoom(GLFWwindow* window, double zoomAmount) {
