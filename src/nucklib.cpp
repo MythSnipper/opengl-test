@@ -443,7 +443,7 @@ namespace nuck{
         GameObject* parent = NULL;
         std::vector<GameObject*> children;
 
-
+        std::vector<void*> Components;
 
         private:
 
