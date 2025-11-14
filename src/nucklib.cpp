@@ -436,6 +436,15 @@ namespace nuck{
     }
 
 
+
+
+
+
+
+
+
+
+
     //Engine
     class GameObject{
         public:
@@ -443,19 +452,47 @@ namespace nuck{
         GameObject* parent = nullptr;
         std::vector<GameObject*> children;
 
+        Transform* transform;
         std::vector<Component*> Components;
 
         private:
-
-
-
 
     };
     class Transform: public Component{
         public:
         glm::vec3 position = glm::vec3(0.0f);
-        glm::vec3 rotation = glm::vec3(0.0f);
+        glm::vec3 rotation = glm::vec3(0.0f); //euler angles in degrees
+        glm::quat rotation_quat = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
         glm::vec3 scale = glm::vec3(1.0f);
+
+        void rotate_local(const glm::vec3& newRotationDegrees){
+            glm::vec3 newRotationRadians = glm::radians(newRotationDegrees);
+            glm::quat newRotationQuat = glm::quat(newRotationRadians);
+            rotation_quat = newRotationQuat * rotation_quat;
+            rotation_quat = glm::normalize(rotation_quat);
+            rotation = glm::degrees(glm::eulerAngles(rotation_quat));
+        }
+        void rotate_global(const glm::vec3& newRotationDegrees){
+            glm::vec3 newRotationRadians = glm::radians(newRotationDegrees);
+            glm::quat newRotationQuat = glm::quat(newRotationRadians);
+            rotation_quat = rotation_quat * newRotationQuat;
+            rotation_quat = glm::normalize(rotation_quat);
+            rotation = glm::degrees(glm::eulerAngles(rotation_quat));
+        }
+        glm::mat4 get_model_matrix(){
+            glm::mat4 translation = glm::translate(glm::mat4(1.0f), position);
+            glm::mat4 rotation = glm::toMat4(rotation_quat);
+            glm::mat4 scale = glm::scale(glm::mat4(1.0f), scale);
+            return translation * rotation * scale;
+        }
+        glm::mat4 get_world_matrix(){ //basically model matrix but affected by parents' world matrices
+            return get_model_matrix() * (parent ? parent->get_world_matrix() : glm::mat4(1.0f));
+        }
+
+        private:
+
+
+
     };
     Mesh::Mesh(const std::vector<Vertex>& verts, const std::vector<uint32_t>& inds)
     : vertices(verts), indices(inds),

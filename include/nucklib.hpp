@@ -198,23 +198,6 @@ namespace nuck{
 
 
     //Engine
-    
-    class Component{
-        public:
-        GameObject* parent = nullptr;
-
-        virtual void Init(){
-
-        }
-        virtual void Update(){
-
-        }
-        virtual void Draw(){
-
-        }
-        private:
-
-    };
     class Mesh{
         public:
         VAO vao;
@@ -232,6 +215,36 @@ namespace nuck{
 
 
     };
+
+
+
+
+
+    
+    class Component{
+        public:
+        GameObject* parent = nullptr;
+
+        virtual void Init(){
+
+        }
+        virtual void Update(){
+
+        }
+        virtual void Draw(){
+
+        }
+        private:
+
+    };
+
+
+
+
+
+
+
+
 
 
     //GL related
