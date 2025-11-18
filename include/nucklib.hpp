@@ -197,30 +197,14 @@ namespace nuck{
 
 
 
+
+
+
+
+
+
+
     //Engine
-    class Mesh{
-        public:
-        VAO vao;
-        VBO vbo;
-        EBO ebo;
-
-        std::vector<Vertex> vertices;
-        std::vector<uint32_t> indices;
-        
-        Mesh(const std::vector<Vertex>& verts, const std::vector<uint32_t>& inds);
-        void draw();
-
-        private:
-
-
-
-    };
-
-
-
-
-
-    
     class Component{
         public:
         GameObject* parent = nullptr;
@@ -240,7 +224,23 @@ namespace nuck{
 
 
 
+    class Mesh{
+        public:
+        VAO vao;
+        VBO vbo;
+        EBO ebo;
 
+        std::vector<Vertex> vertices;
+        std::vector<uint32_t> indices;
+        
+        Mesh(const std::vector<Vertex>& verts, const std::vector<uint32_t>& inds);
+        void draw();
+
+        private:
+
+
+
+    };
 
 
 
